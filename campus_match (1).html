@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== CAMPUS MATCH — REDESIGNED UI ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --rose:       #e8637a;
+  --rose-deep:  #c94060;
+  --blush:      #fce8ed;
+  --petal:      #f9d2db;
+  --cream:      #fdf6f8;
+  --ink:        #1a0a0f;
+  --smoke:      #6b4a52;
+  --glass:      rgba(255,255,255,0.62);
+  --glass-border: rgba(255,255,255,0.75);
+  --shadow:     0 24px 60px rgba(180,60,90,0.18);
+  --shadow-sm:  0 8px 24px rgba(180,60,90,0.12);
+  --radius:     22px;
+  --radius-sm:  14px;
+
+  --bg-login:    linear-gradient(135deg, #fde8ef 0%, #f8c8d4 50%, #f3a8be 100%);
+  --bg-signup:   linear-gradient(135deg, #e0f0ff 0%, #c8dcf8 50%, #b8c8f0 100%);
+  --bg-profile:  linear-gradient(135deg, #fef3e2 0%, #fce8c8 50%, #f8d8b0 100%);
+  --bg-dash:     linear-gradient(135deg, #fff0f3 0%, #fcd8e0 50%, #f8c0cc 100%);
+  --bg-swipe:    linear-gradient(135deg, #f0f8ff 0%, #d8ecf8 50%, #c8e0f4 100%);
+  --bg-match:    linear-gradient(135deg, #f8f0ff 0%, #ead8f8 50%, #dcc0f0 100%);
+  --bg-chat:     linear-gradient(135deg, #fffaf0 0%, #fef0d0 50%, #fde8b8 100%);
+  --bg-verify:   linear-gradient(135deg, #f0fff4 0%, #d0f0e0 50%, #b8e8d0 100%);
+  --bg-settings: linear-gradient(135deg, #f0f8ff 0%, #d8eeff 50%, #c0e0ff 100%);
+}
+
+body.dark {
+  --glass:        rgba(20, 8, 12, 0.72);
+  --glass-border: rgba(255,255,255,0.10);
+  --shadow:       0 24px 60px rgba(0,0,0,0.50);
+  --shadow-sm:    0 8px 24px rgba(0,0,0,0.38);
+  --cream:        #120608;
+  --ink:          #fde8ed;
+  --smoke:        #c8a0a8;
+  --blush:        rgba(255,255,255,0.06);
+
+  --bg-login:    linear-gradient(135deg, #2a0a12 0%, #3a1020 50%, #1e0810 100%);
+  --bg-signup:   linear-gradient(135deg, #0a1020 0%, #101828 50%, #0c1430 100%);
+  --bg-profile:  linear-gradient(135deg, #1a1008 0%, #281808 50%, #200e04 100%);
+  --bg-dash:     linear-gradient(135deg, #1a0810 0%, #280c18 50%, #200a14 100%);
+  --bg-swipe:    linear-gradient(135deg, #081018 0%, #0c1828 50%, #081420 100%);
+  --bg-match:    linear-gradient(135deg, #100818 0%, #180c28 50%, #140820 100%);
+  --bg-chat:     linear-gradient(135deg, #181008 0%, #261808 50%, #1e1204 100%);
+  --bg-verify:   linear-gradient(135deg, #081410 0%, #0c2018 50%, #081c14 100%);
+  --bg-settings: linear-gradient(135deg, #081018 0%, #0c1828 50%, #081420 100%);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: background 0.7s ease;
+  background: var(--bg-login);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(232,99,122,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 80%, rgba(180,60,100,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(252,184,200,0.10) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: meshDrift 20s ease-in-out infinite alternate;
+}
+
+@keyframes meshDrift {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 1;   transform: scale(1.05); }
+}
+
+body.dark::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(200,40,80,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 80%, rgba(120,20,50,0.10) 0%, transparent 70%);
+}
+
+/* ===== WATERMARK ===== */
+.watermark {
+  position: fixed;
+  top: 50%; left: 50%;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 96px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: transparent;
+  background: linear-gradient(135deg, rgba(232,99,122,0.22), rgba(180,60,90,0.12), rgba(232,99,122,0.22));
+  -webkit-background-clip: text;
+  background-clip: text;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 0;
+  animation: watermarkFloat 16s ease-in-out infinite;
+  user-select: none;
+}
+
+@keyframes watermarkFloat {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-18deg) translateY(0); }
+  50%       { transform: translate(-50%, -50%) rotate(-18deg) translateY(-16px); }
+}
+
+/* ===== FLOATING ICONS ===== */
+.floating-container {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.floating-icon {
+  position: absolute; bottom: -60px;
+  animation: floatUp 18s linear infinite;
+  opacity: 0; font-size: 20px;
+  filter: blur(0.3px);
+}
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+  15%  { opacity: 0.45; }
+  85%  { opacity: 0.45; }
+  100% { transform: translateY(-115vh) rotate(380deg) scale(1.2); opacity: 0; }
+}
+.floating-icon:nth-child(1) { left: 8%;  animation-duration: 14s; animation-delay: 0s;   font-size: 22px; }
+.floating-icon:nth-child(2) { left: 23%; animation-duration: 19s; animation-delay: 3.5s; font-size: 16px; }
+.floating-icon:nth-child(3) { left: 42%; animation-duration: 12s; animation-delay: 1.5s; font-size: 26px; }
+.floating-icon:nth-child(4) { left: 61%; animation-duration: 22s; animation-delay: 5s;   font-size: 18px; }
+.floating-icon:nth-child(5) { left: 78%; animation-duration: 16s; animation-delay: 0.8s; font-size: 20px; }
+.floating-icon:nth-child(6) { left: 92%; animation-duration: 20s; animation-delay: 4.2s; font-size: 24px; }
+
+/* ===== FOOTER WATERMARK ===== */
+.watermark-footer {
+  position: fixed; bottom: 14px; right: 20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: rgba(201, 64, 96, 0.4);
+  pointer-events: none; z-index: 9999;
+}
+
+/* ===== FLOATING HEARTS ===== */
+.heart {
+  position: fixed; bottom: -50px; width: 16px; height: 16px;
+  background: transparent; transform: rotate(45deg);
+  animation: floatHeart 12s infinite linear;
+  z-index: 0; opacity: 0;
+}
+.heart::before, .heart::after {
+  content: ''; position: absolute; width: 16px; height: 16px;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  border-radius: 50%;
+}
+.heart::before { top: -8px; left: 0; }
+.heart::after  { left: 8px; top: 0; }
+@keyframes floatHeart {
+  0%   { transform: translateY(0) rotate(45deg) scale(0.6); opacity: 0.6; }
+  100% { transform: translateY(-100vh) rotate(45deg) scale(1.4); opacity: 0; }
+}
+
+/* ===== DARK / LIGHT TOGGLE ===== */
+#modeToggle {
+  position: fixed; top: 18px; right: 18px;
+  padding: 9px 18px;
+  width: auto;
+  border-radius: 50px;
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  color: var(--rose-deep);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  margin-top: 0;
+}
+#modeToggle:hover {
+  transform: scale(1.06) translateY(-1px);
+  box-shadow: var(--shadow);
+  background: var(--rose);
+  color: white;
+  border-color: var(--rose);
+}
+body.dark #modeToggle { color: #f4a0b0; }
+body.dark #modeToggle:hover { color: white; }
+
+/* ===== GLASSMORPHIC CONTAINER ===== */
+.container {
+  display: none;
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  width: 92%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative; z-index: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232,99,122,0.3) transparent;
+}
+.container::-webkit-scrollbar { width: 4px; }
+.container::-webkit-scrollbar-thumb { background: rgba(232,99,122,0.3); border-radius: 4px; }
+
+.container.active {
+  display: block;
+  animation: slideUp 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.container::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: var(--radius);
+  opacity: 0.45;
+  z-index: -1;
+  transition: opacity 0.5s;
+}
+#loginPage::before    { background: var(--bg-login); }
+#signupPage::before   { background: var(--bg-signup); }
+#profilePage::before  { background: var(--bg-profile); }
+#dashboardPage::before{ background: var(--bg-dash); }
+#swipePage::before    { background: var(--bg-swipe); }
+#matchPage::before    { background: var(--bg-match); }
+#chatPage::before     { background: var(--bg-chat); }
+#verificationPage::before { background: var(--bg-verify); }
+#settingsPage::before { background: var(--bg-settings); }
+
+/* ===== HEADINGS ===== */
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--rose-deep);
+  letter-spacing: 0.02em;
+  margin-bottom: 22px;
+  line-height: 1.2;
+}
+body.dark h2 { color: #f09aaa; }
+
+/* ===== INPUTS ===== */
+input, select, textarea {
+  width: 100%;
+  margin: 8px 0;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(232,99,122,0.18);
+  background: rgba(255,255,255,0.48);
+  backdrop-filter: blur(8px);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink);
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  outline: none;
+}
+input::placeholder, textarea::placeholder { color: #b08090; }
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--rose);
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 0 0 3px rgba(232,99,122,0.15);
+  transform: translateY(-1px);
+}
+
+select {
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8637a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+}
+
+textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+body.dark input, body.dark select, body.dark textarea {
+  color: #f0d8e0;
+  background: rgba(20, 5, 10, 0.55);
+  border-color: rgba(232,99,122,0.25);
+}
+body.dark input::placeholder, body.dark textarea::placeholder { color: #806070; }
+body.dark input:focus, body.dark select:focus, body.dark textarea:focus {
+  background: rgba(40, 10, 18, 0.75);
+  border-color: #e8637a;
+  box-shadow: 0 0 0 3px rgba(232,99,122,0.20);
+}
+
+/* ===== PASSWORD WRAPPER ===== */
+.password-wrapper { position: relative; width: 100%; margin: 8px 0; }
+.password-wrapper input { margin: 0; padding-right: 46px; }
+.password-toggle {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; font-size: 16px; opacity: 0.55;
+  transition: opacity 0.2s; user-select: none; z-index: 2;
+}
+.password-toggle:hover { opacity: 0.9; }
+
+/* ===== PASSWORD STRENGTH ===== */
+#passwordStrengthIndicator { margin: 2px 0 10px; }
+#strength-bar {
+  height: 4px; width: 0%; background: #ddd;
+  border-radius: 4px; transition: width 0.4s ease, background-color 0.4s ease;
+}
+#strength-text {
+  font-size: 11px; color: var(--smoke); margin-top: 4px; display: block;
+  font-weight: 500; letter-spacing: 0.02em;
+}
+body.dark #strength-text { color: #b09098; }
+
+/* ===== BUTTONS ===== */
+button {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 6px 20px rgba(232,99,122,0.38);
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+button::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+button:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 12px 30px rgba(232,99,122,0.48);
+}
+
+button:active { transform: translateY(0) scale(0.99); }
+
+#deleteAccountBtn {
+  background: linear-gradient(135deg, #e84040, #c02020);
+  box-shadow: 0 6px 20px rgba(220,40,40,0.35);
+}
+
+/* ===== NOTIFICATION BADGE ===== */
+.notification-wrapper { position: relative; width: 100%; margin-top: 10px; }
+.notification-wrapper button { margin-top: 0; }
+
+#matchNotificationBadge {
+  position: absolute; top: 8px; right: 12px;
+  background: linear-gradient(135deg, #e84040, #c02020);
+  color: white; border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 11px; font-weight: 700;
+  box-shadow: 0 2px 8px rgba(220,40,40,0.5);
+}
+
+/* ===== LINKS ===== */
+a { color: var(--rose); font-weight: 500; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
+a:hover { opacity: 0.75; text-decoration: underline; }
+
+p { font-size: 14px; color: var(--smoke); line-height: 1.6; }
+body.dark p { color: #c0a0a8; }
+
+label { font-size: 13px; font-weight: 500; color: var(--smoke); display: block; margin: 8px 0 2px; letter-spacing: 0.02em; }
+body.dark label { color: #b090a0; }
+
+hr { border: none; border-top: 1px solid rgba(232,99,122,0.18); margin: 20px 0; }
+
+.demo-note {
+  font-size: 12.5px; color: var(--smoke);
+  text-align: center; margin-top: 6px;
+  font-style: italic; opacity: 0.75;
+}
+body.dark .demo-note { color: #a08090; }
+
+/* ===== CARDS ===== */
+.card {
+  position: relative;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 12px 0;
+  border: 1.5px solid rgba(255,255,255,0.65);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+body.dark .card {
+  background: rgba(30, 8, 14, 0.55);
+  border-color: rgba(232,99,122,0.15);
+}
+.card img { width: 100%; border-radius: var(--radius-sm); margin-top: 10px; object-fit: cover; max-height: 220px; }
+
+.card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 600;
+  color: var(--rose-deep); margin-top: 12px;
+}
+.card p { font-size: 13px; margin-top: 4px; }
+body.dark .card h3 { color: #f0a0b0; }
+
+.swipe-card-actions {
+  display: flex; justify-content: center; gap: 16px;
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid rgba(232,99,122,0.12);
+}
+.swipe-card-actions button {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  font-size: 20px; margin-top: 0; padding: 0;
+  line-height: 54px; flex-shrink: 0;
+}
+
+body.dark .swipe-card-actions { border-top: 1px solid rgba(232,99,122,0.1); }
+
+/* ===== MATCH BAR ===== */
+.bar {
+  background: rgba(232,99,122,0.12);
+  height: 8px; border-radius: 8px; overflow: hidden; margin-top: 8px;
+}
+.fill {
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+  height: 100%; transition: width 0.6s cubic-bezier(0.23,1,0.32,1);
+  border-radius: 8px;
+}
+
+/* ===== CHAT NOTIFICATION BADGE ===== */
+.chat-notification-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: linear-gradient(135deg, #4a90e2, #2a60c2);
+  color: white; border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 11px; font-weight: 700;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(74,144,226,0.4);
+}
+body.dark .chat-notification-badge { border-color: #1a0810; }
+
+/* ===== LAST SEEN ===== */
+.last-seen {
+  font-size: 11.5px; color: var(--smoke);
+  margin: -6px 0 10px; font-weight: 500;
+}
+body.dark .last-seen { color: #a08090; }
+
+/* ===== INTERESTS GRID ===== */
+.interests-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 10px 0;
+}
+.interests-grid label {
+  background: rgba(255,255,255,0.35);
+  padding: 9px 10px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: all 0.25s;
+  border: 1.5px solid transparent;
+  font-size: 13.5px; font-weight: 400;
+  color: var(--ink);
+}
+.interests-grid label:hover { background: rgba(232,99,122,0.10); border-color: rgba(232,99,122,0.3); }
+.interests-grid input[type="checkbox"] { width: auto; margin: 0; accent-color: var(--rose); }
+body.dark .interests-grid label { background: rgba(0,0,0,0.25); color: #e0c0c8; }
+body.dark .interests-grid label:hover { background: rgba(232,99,122,0.12); }
+
+/* ===== CHAT UI ===== */
+.chat-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(232,99,122,0.15);
+}
+.chat-header h2 { margin-bottom: 0; font-size: 1.4rem; }
+
+#callButtons { display: flex; gap: 6px; }
+#callButtons button {
+  width: 38px; height: 38px; border-radius: 50%;
+  padding: 0; margin: 0; font-size: 16px; line-height: 38px;
+  box-shadow: var(--shadow-sm); flex-shrink: 0;
+}
+#callButtons .block-btn {
+  background: linear-gradient(135deg, #e84040, #c02020);
+}
+
+#chatBox {
+  height: 200px; overflow-y: auto; overflow-x: hidden;
+  border-radius: var(--radius-sm); padding: 12px;
+  background: rgba(255,255,255,0.28);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  margin-bottom: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232,99,122,0.3) transparent;
+}
+body.dark #chatBox { background: rgba(10,2,6,0.45); border-color: rgba(232,99,122,0.12); }
+
+#typingIndicator {
+  padding: 5px 12px; font-style: italic;
+  color: var(--smoke); font-size: 13px; height: 26px;
+  box-sizing: border-box;
+}
+body.dark #typingIndicator { color: #a09098; }
+
+/* ===== MESSAGE BUBBLES ===== */
+.message-container { display: flex; margin-bottom: 8px; }
+.message-container.sent  { justify-content: flex-end; }
+.message-container.received { justify-content: flex-start; }
+
+.message-bubble {
+  max-width: 72%; padding: 9px 13px;
+  border-radius: 18px; position: relative;
+}
+.message-container.sent .message-bubble {
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: white; border-bottom-right-radius: 5px;
+  box-shadow: 0 4px 12px rgba(232,99,122,0.25);
+}
+.message-container.received .message-bubble {
+  background: rgba(255,255,255,0.55); color: var(--ink);
+  border-bottom-left-radius: 5px; border: 1px solid rgba(255,255,255,0.75);
+}
+body.dark .message-container.received .message-bubble {
+  background: rgba(20,5,10,0.55); color: #f0d0d8;
+  border-color: rgba(232,99,122,0.15);
+}
+.message-text { margin: 0; padding: 0; font-size: 14px; line-height: 1.45; }
+.message-time {
+  font-size: 10px; display: block; text-align: right; margin-top: 4px; opacity: 0.65;
+}
+
+/* ===== CALL OVERLAY ===== */
+#callOverlay {
+  position: fixed; inset: 0;
+  background: rgba(10,2,8,0.82); backdrop-filter: blur(16px);
+  display: none; justify-content: center; align-items: center; z-index: 100;
+}
+.call-container { text-align: center; color: white; }
+.call-container img {
+  width: 110px; height: 110px; border-radius: 50%;
+  border: 3px solid rgba(232,99,122,0.6);
+  margin-bottom: 20px; box-shadow: 0 0 40px rgba(232,99,122,0.4);
+  animation: callPulse 2s ease-in-out infinite;
+}
+@keyframes callPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(232,99,122,0.3), 0 0 0 0 rgba(232,99,122,0.25); }
+  50%       { box-shadow: 0 0 50px rgba(232,99,122,0.5), 0 0 0 18px rgba(232,99,122,0); }
+}
+.call-container h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 6px; }
+.call-container p  { font-size: 16px; margin-bottom: 28px; opacity: 0.75; }
+#hangUpButton {
+  background: linear-gradient(135deg, #e84040, #c02020);
+  box-shadow: 0 8px 24px rgba(220,40,40,0.45);
+  width: auto; padding: 13px 36px;
+}
+
+/* ===== SEARCH INPUT ===== */
+input[type="search"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8637a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 42px;
+}
+
+/* ===== FILE INPUT ===== */
+input[type="file"] {
+  padding: 10px 14px; font-size: 13px;
+  border-style: dashed; border-color: rgba(232,99,122,0.3);
+  background: rgba(255,255,255,0.25); cursor: pointer;
+}
+input[type="file"]:hover { border-color: var(--rose); background: rgba(232,99,122,0.06); }
+
+#preview {
+  display: none; width: 100%; border-radius: var(--radius-sm);
+  margin-top: 12px; object-fit: cover; max-height: 240px;
+  box-shadow: var(--shadow-sm); border: 2px solid rgba(232,99,122,0.2);
+}
+
+#camera { border-radius: var(--radius-sm); margin-bottom: 10px; display: none; box-shadow: var(--shadow-sm); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .watermark { font-size: 52px; }
+  .container { padding: 24px 20px; width: 96%; }
+  .interests-grid { grid-template-columns: 1fr; }
+  h2 { font-size: 1.6rem; }
+  button { font-size: 13.5px; padding: 13px 16px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Animated Watermark -->
+<div class="watermark">Campus Match</div>
+
+<!-- Romantic Floating Icons -->
+<div class="floating-container">
+    <div class="floating-icon">❤️</div>
+    <div class="floating-icon">🌹</div>
+    <div class="floating-icon">💌</div>
+    <div class="floating-icon">💕</div>
+    <div class="floating-icon">💖</div>
+    <div class="floating-icon">💍</div>
+</div>
+
+<!-- Fixed Footer Watermark -->
+<div class="watermark-footer">Campus Match © 2024</div>
+
+<!-- Dark/Light Toggle -->
+<button id="modeToggle">🌙 Dark</button>
+
+<div class="heart" style="left:15%; animation-delay: 0s;"></div>
+<div class="heart" style="left:35%; animation-delay: 2s;"></div>
+<div class="heart" style="left:55%; animation-delay: 4s;"></div>
+<div class="heart" style="left:75%; animation-delay: 6s;"></div>
+
+<!-- LOGIN -->
+<div id="loginPage" class="container active">
+<h2>Login</h2>
+<input id="loginIdentifier" type="text" placeholder="Email or University ID">
+<div class="password-wrapper">
+    <input id="loginPass" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<button onclick="login()">Login</button>
+<p style="font-size: 14px; text-align: right; margin-top: 5px;"><a onclick="forgotPassword()" style="cursor:pointer">Forgot Password?</a></p>
+<p>No account? <a onclick="showPage('signupPage')" style="cursor:pointer">Signup</a></p>
+</div>
+
+<!-- SIGNUP -->
+<div id="signupPage" class="container">
+<h2 style="text-align:center">Signup</h2>
+<input id="name" placeholder="Full Name">
+<input id="email" type="email" placeholder="Email Address">
+<input id="age" placeholder="Age">
+<select id="gender"><option>Male</option><option>Female</option></select>
+<select id="pref"><option>Male</option><option>Female</option><option>Any</option></select>
+<input id="faculty" placeholder="Faculty (e.g. Computer Science)">
+<input id="year" placeholder="Year">
+<input id="studentID" placeholder="Student ID">
+<div class="password-wrapper">
+    <input id="password" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div id="passwordStrengthIndicator">
+    <div id="strength-bar"></div>
+    <span id="strength-text"></span>
+</div>
+<div class="password-wrapper">
+    <input id="confirmPassword" type="password" placeholder="Confirm Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<button onclick="signup()">Signup</button>
+<p>Already have an account? <a onclick="showPage('loginPage')" style="cursor:pointer">Login</a></p>
+</div>
+
+<!-- VERIFICATION -->
+<div id="verificationPage" class="container">
+    <h2 style="text-align:center">Verify Your Email</h2>
+    <p>A verification link has been sent to <strong id="verificationEmail">your email address</strong>. Please check your inbox and click the link to complete your registration.</p>
+    <p class="demo-note">(Since this is a demo without a backend server, no email is actually sent. You can proceed by clicking the button below.)</p>
+    <button onclick="verifyCode()">Simulate Email Verification</button>
+    <button id="resendVerificationBtn" onclick="resendVerification()">Resend Link</button>
+    <p style="margin-top: 10px; text-align: center;"><a onclick="showPage('loginPage')" style="cursor:pointer">Back to Login</a></p>
+</div>
+
+<!-- PROFILE -->
+<div id="profilePage" class="container">
+<h2 style="text-align:center">Profile Setup</h2>
+<textarea id="bio" placeholder="Short bio"></textarea>
+<label>Take Photo:</label>
+<video id="camera" width="100%" autoplay style="border-radius: 15px; margin-bottom: 10px; display:none;"></video>
+<canvas id="canvas" style="display:none"></canvas>
+<button onclick="startCamera()">Open Camera</button>
+<button onclick="takePhoto()">Take Photo</button>
+<label style="text-align:center; display:block; margin-top:10px;">OR Upload Image (Max 2MB)</label>
+<input type="file" id="upload" onchange="checkFileSize()">
+<img id="preview" class="preview" alt="Image Preview" style="display:none; width:100%; border-radius:15px; margin-top:10px;">
+
+<label style="text-align:center; display:block; margin-top:10px;">Interests:</label>
+<div class="interests-grid">
+  <label><input type="checkbox" value="Music"> Music</label>
+  <label><input type="checkbox" value="Sports"> Sports</label>
+  <label><input type="checkbox" value="Coding"> Coding</label>
+  <label><input type="checkbox" value="Movies"> Movies</label>
+  <label><input type="checkbox" value="Art"> Art</label>
+  <label><input type="checkbox" value="Travel"> Travel</label>
+  <label><input type="checkbox" value="Photography"> Photography</label>
+  <label><input type="checkbox" value="Gaming"> Gaming</label>
+  <label><input type="checkbox" value="Food"> Food</label>
+  <label><input type="checkbox" value="Fitness"> Fitness</label>
+  <label><input type="checkbox" value="Reading"> Reading</label>
+  <label><input type="checkbox" value="Dancing"> Dancing</label>
+</div>
+<input id="insta" placeholder="Instagram">
+<button onclick="saveProfile()">Save Profile</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardPage" class="container">
+<h2 style="text-align:center">Welcome <span id="userName"></span></h2>
+<button onclick="startSwipe()">Discover People</button>
+<button onclick="showMatches()">Find Matches</button>
+<button onclick="showPage('profilePage')">Edit Profile</button>
+<button onclick="showSettingsPage()">Account Settings</button>
+<hr style="border:none;border-top:1px solid rgba(232,99,122,0.2);margin:8px 0;">
+<button onclick="DB.downloadCSV()" style="background:linear-gradient(135deg,#4a90e2,#2a60c2);box-shadow:0 6px 20px rgba(74,144,226,0.35);">⬇ Export Profiles CSV</button>
+<label for="csvImportInput" style="display:block;margin-top:10px;">
+  <div style="width:100%;padding:14px 20px;border:none;border-radius:50px;background:linear-gradient(135deg,#27ae60,#1a8a45);color:white;font-weight:600;font-size:14.5px;letter-spacing:0.04em;cursor:pointer;transition:all 0.3s;box-shadow:0 6px 20px rgba(39,174,96,0.35);text-align:center;position:relative;overflow:hidden;">
+    ⬆ Import Profiles CSV
+  </div>
+</label>
+<input type="file" id="csvImportInput" accept=".csv" style="display:none;" onchange="handleCSVImport(event)">
+<button onclick="logout()" style="background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;margin-top:10px;">Logout</button>
+</div>
+
+<!-- SETTINGS -->
+<div id="settingsPage" class="container">
+<h2 style="text-align:center">Account Settings</h2>
+<label>Current Password (required for changes)</label>
+<input id="currentPass" type="password" placeholder="Enter current password">
+<hr style="border: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+<label>New Email</label>
+<input id="newEmail" type="email" placeholder="Enter new email address">
+<label>New Password</label>
+<div class="password-wrapper">
+    <input id="currentPass" type="password" placeholder="Enter current password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div class="password-wrapper">
+    <input id="newPass" type="password" placeholder="Enter new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div class="password-wrapper">
+    <input id="confirmNewPass" type="password" placeholder="Confirm new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<button onclick="saveSettings()">Save Changes</button>
+<button id="deleteAccountBtn" onclick="deleteAccount()">Delete Account</button>
+<button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- SWIPE -->
+<div id="swipePage" class="container">
+<h2 style="text-align:center">Discover People</h2>
+<div id="swipeCard"></div>
+<button onclick="likeUser()">❤️ Like</button>
+<button onclick="passUser()">❌ Pass</button>
+<button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- MATCHES -->
+<div id="matchPage" class="container">
+  <h2 style="text-align:center">Find People</h2>
+
+  <!-- Tabs -->
+  <div id="matchTabs" style="display:flex;gap:8px;margin-bottom:14px;">
+    <button id="tabMatches" onclick="switchMatchTab('matches')"
+      style="flex:1;margin:0;padding:10px;border-radius:50px;font-size:13px;">
+      💞 My Matches
+    </button>
+    <button id="tabAll" onclick="switchMatchTab('all')"
+      style="flex:1;margin:0;padding:10px;border-radius:50px;font-size:13px;background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;">
+      🔍 All Profiles
+    </button>
+  </div>
+
+  <!-- Search bar -->
+  <input type="search" id="matchSearchInput" oninput="filterMatches()"
+    placeholder="Search by name, faculty, interests…" style="margin-bottom:4px;">
+
+  <!-- Filters row (shown only in All Profiles tab) -->
+  <div id="matchFilters" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+    <select id="filterGender" onchange="filterMatches()" style="flex:1;min-width:110px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <select id="filterFaculty" onchange="filterMatches()" style="flex:1;min-width:130px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Faculty</option>
+    </select>
+    <select id="filterYear" onchange="filterMatches()" style="flex:1;min-width:90px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Year</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4">Year 4</option>
+      <option value="5">Year 5</option>
+    </select>
+  </div>
+
+  <!-- Result count -->
+  <p id="matchResultCount" style="font-size:12px;text-align:right;margin-bottom:6px;opacity:0.6;"></p>
+
+  <div id="matchList"></div>
+  <button onclick="showPage('dashboardPage')" style="background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;margin-top:6px;">Back</button>
+</div>
+
+<!-- CHAT -->
+<div id="chatPage" class="container">
+<div class="chat-header">
+  <h2 id="chatPartnerName" style="text-align:center; margin: 0; flex-grow: 1;">Chat</h2>
+  <div id="callButtons"></div>
+</div>
+<div id="chatBox" style="height:200px;overflow:auto;border:1px solid #ccc;padding:10px"></div>
+<div id="typingIndicator" style="display: none;"></div>
+<input id="chatInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+<button onclick="showPage('matchPage')">Back</button>
+</div>
+
+<!-- CALL OVERLAY -->
+<div id="callOverlay">
+    <div class="call-container">
+        <img id="callPartnerAvatar" src="" alt="Avatar">
+        <h3 id="callStatus">Calling...</h3>
+        <p id="callPartnerNameOverlay"></p>
+        <button id="hangUpButton" onclick="hangUp()">Hang Up</button>
+    </div>
+</div>
+
+<script>
+// --- DATA STORAGE (localStorage + CSV) ---
+const DB = {
+    _usersKey: 'campusMatchUsers',
+    _currentUserKey: 'campusMatchCurrentUser',
+    _themeKey: 'campusMatchTheme',
+    _chatsKey: 'campusMatchChats',
+    _csvKey: 'campusMatchCSV',
+
+    getUsers: function() {
+        const stored = localStorage.getItem(this._usersKey);
+        return stored ? JSON.parse(stored) : null;
+    },
+    saveUsers: function(usersArray) {
+        localStorage.setItem(this._usersKey, JSON.stringify(usersArray));
+        localStorage.setItem(this._csvKey, this.usersToCSV(usersArray));
+    },
+    getCurrentUserId: function() {
+        return localStorage.getItem(this._currentUserKey);
+    },
+    setCurrentUserId: function(userId) {
+        if (userId) {
+            localStorage.setItem(this._currentUserKey, userId);
+        } else {
+            localStorage.removeItem(this._currentUserKey);
+        }
+    },
+    getTheme: function() {
+        return localStorage.getItem(this._themeKey);
+    },
+    setTheme: function(theme) {
+        localStorage.setItem(this._themeKey, theme);
+    },
+    getChats: function() {
+        const stored = localStorage.getItem(this._chatsKey);
+        return stored ? JSON.parse(stored) : {};
+    },
+    saveChats: function(chatsObject) {
+        localStorage.setItem(this._chatsKey, JSON.stringify(chatsObject));
+    },
+
+    // --- CSV UTILITIES ---
+    CSV_HEADERS: ['id','password','name','email','age','gender','preference','faculty','year','bio','photo','insta','interests','likes','passes','blocked','newMatches'],
+
+    _escapeCSV: function(value) {
+        if (value === null || value === undefined) return '';
+        const str = String(value);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    },
+
+    _parseCSVLine: function(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+                else { inQuotes = !inQuotes; }
+            } else if (ch === ',' && !inQuotes) {
+                result.push(current); current = '';
+            } else {
+                current += ch;
+            }
+        }
+        result.push(current);
+        return result;
+    },
+
+    usersToCSV: function(usersArray) {
+        const rows = [this.CSV_HEADERS.join(',')];
+        usersArray.forEach(user => {
+            const photoVal = user.photo && user.photo.startsWith('data:') ? '[photo_data]' : (user.photo || '');
+            const row = [
+                user.id, user.password, user.name, user.email, user.age,
+                user.gender, user.preference, user.faculty, user.year,
+                user.bio || '', photoVal, user.insta || '',
+                (user.interests || []).join('|'),
+                (user.likes || []).join('|'),
+                (user.passes || []).join('|'),
+                (user.blocked || []).join('|'),
+                (user.newMatches || []).join('|')
+            ].map(v => this._escapeCSV(v));
+            rows.push(row.join(','));
+        });
+        return rows.join('\n');
+    },
+
+    csvToUsers: function(csvText, existingUsers) {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) return null;
+        const headers = this._parseCSVLine(lines[0]);
+        const parsed = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const vals = this._parseCSVLine(lines[i]);
+            const obj = {};
+            headers.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
+            obj.interests  = obj.interests  ? obj.interests.split('|').filter(Boolean)  : [];
+            obj.likes      = obj.likes      ? obj.likes.split('|').filter(Boolean)      : [];
+            obj.passes     = obj.passes     ? obj.passes.split('|').filter(Boolean)     : [];
+            obj.blocked    = obj.blocked    ? obj.blocked.split('|').filter(Boolean)    : [];
+            obj.newMatches = obj.newMatches ? obj.newMatches.split('|').filter(Boolean) : [];
+            if (obj.photo === '[photo_data]' && existingUsers) {
+                const existing = existingUsers.find(u => u.id === obj.id);
+                if (existing) obj.photo = existing.photo;
+            }
+            parsed.push(obj);
+        }
+        return parsed.length > 0 ? parsed : null;
+    },
+
+    downloadCSV: function() {
+        const csv = localStorage.getItem(this._csvKey);
+        if (!csv) { alert('No profile data to export yet.'); return; }
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = 'campus_match_profiles.csv';
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+    },
+
+    importCSVFromFile: function(file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            const existingUsers = this.getUsers() || [];
+            const imported = this.csvToUsers(text, existingUsers);
+            if (imported) { this.saveUsers(imported); callback(imported); }
+            else { alert('Could not parse CSV. Please use a Campus Match export.'); }
+        };
+        reader.readAsText(file);
+    }
+};
+
+// Wait for the DOM to be fully loaded before running scripts
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- STATE MANAGEMENT ---
+    let currentUser = null;
+    let users = [];
+    let swipeQueue = [];
+    let currentSwipeUser = null;
+    let currentChatUser = null;
+    let currentMatchList = []; // For filtering
+    let pendingUser = null; // For email verification
+
+    // DOM Elements
+    const body = document.body;
+    const modeToggleButton = document.getElementById('modeToggle');
+    const allPages = document.querySelectorAll('.container');
+    const userNameSpan = document.getElementById('userName');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // --- HELPERS ---
+    function getChatId(userId1, userId2) {
+        return [userId1, userId2].sort().join('_');
+    }
+
+    function formatTimestamp(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatLastSeen(isoString) {
+        if (!isoString) return 'Offline';
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffSeconds = Math.floor((now - date) / 1000);
+
+        if (diffSeconds < 300) return '🟢 Online'; // 5 mins threshold
+        if (diffSeconds < 86400) return `Last seen ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        return `Last seen ${date.toLocaleDateString()}`;
+    }
+
+    // --- TOAST NOTIFICATION ---
+    window.showToast = (msg) => {
+        let toast = document.getElementById('csvToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'csvToast';
+            toast.style.cssText = `
+                position:fixed; bottom:50px; left:50%; transform:translateX(-50%) translateY(20px);
+                background:linear-gradient(135deg,#27ae60,#1a8a45);
+                color:white; padding:11px 22px; border-radius:50px;
+                font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:600;
+                box-shadow:0 8px 24px rgba(39,174,96,0.4);
+                z-index:9998; opacity:0; transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
+                pointer-events:none; white-space:nowrap;
+            `;
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+        });
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(20px)';
+        }, 2800);
+    }
+
+    // --- INITIALIZATION ---
+    function initializeApp() {
+        // Load users from localStorage or create dummy data
+        const storedUsers = DB.getUsers();
+        if (storedUsers) {
+            users = storedUsers;
+        } else {
+            // Create some dummy users if none exist
+            users = [
+                { id: 'u1', password: 'p', name: 'Sara', email: 'sara@example.com', age: 21, gender: 'Female', preference: 'Male', faculty: 'Medical', year: '3', bio: 'Future doctor, love hiking and coffee.', photo: 'https://i.pravatar.cc/300?img=5', interests: ['Movies', 'Travel', 'Food'], likes: ['u2'], passes: [], blocked: [] },
+                { id: 'u2', password: 'p', name: 'Nimal', email: 'nimal@example.com', age: 22, gender: 'Male', preference: 'Female', faculty: 'Computer Science', year: '4', bio: 'Code, games, and more code.', photo: 'https://i.pravatar.cc/300?img=12', interests: ['Coding', 'Gaming', 'Music'], likes: ['u1'], passes: [], blocked: [] },
+                { id: 'u3', password: 'p', name: 'Ashani', email: 'ashani@example.com', age: 20, gender: 'Female', preference: 'Any', faculty: 'Arts', year: '2', bio: 'Painting my way through life.', photo: 'https://i.pravatar.cc/300?img=9', interests: ['Art', 'Reading', 'Photography'], likes: [], passes: [], blocked: [] },
+                { id: 'u4', password: 'p', name: 'Raj', email: 'raj@example.com', age: 23, gender: 'Male', preference: 'Female', faculty: 'Management', year: '4', bio: 'Aspiring entrepreneur. Let\'s connect!', photo: 'https://i.pravatar.cc/300?img=7', interests: ['Sports', 'Fitness', 'Travel'], likes: [], passes: [], blocked: [] },
+                { id: 'u5', password: 'p', name: 'Priya', email: 'priya@example.com', age: 22, gender: 'Female', preference: 'Male', faculty: 'Science', year: '3', bio: 'Loves a good workout and a great meal.', photo: 'https://i.pravatar.cc/300?img=25', interests: ['Fitness', 'Food', 'Travel'], likes: [], passes: [], blocked: [] },
+                { id: 'u6', password: 'p', name: 'Kavin', email: 'kavin@example.com', age: 24, gender: 'Male', preference: 'Female', faculty: 'Engineering', year: '5', bio: 'Capturing moments and exploring new places.', photo: 'https://i.pravatar.cc/300?img=32', interests: ['Photography', 'Travel', 'Movies'], likes: [], passes: [], blocked: [] },
+                { id: 'u7', password: 'p', name: 'Maya', email: 'maya@example.com', age: 19, gender: 'Female', preference: 'Any', faculty: 'Law', year: '1', bio: 'Dancing through deadlines. Music is my escape.', photo: 'https://i.pravatar.cc/300?img=35', interests: ['Dancing', 'Music', 'Reading'], likes: [], passes: [], blocked: [] },
+                { id: 'u8', password: 'p', name: 'Liam', email: 'liam@example.com', age: 21, gender: 'Male', preference: 'Female', faculty: 'Humanities', year: '2', bio: 'Bookworm and film buff. Let\'s discuss our favorites.', photo: 'https://i.pravatar.cc/300?img=52', interests: ['Reading', 'Movies', 'Gaming'], likes: [], passes: [], blocked: [] },
+                { id: 'u9', password: 'p', name: 'Sinethya', email: 'sinethya@example.com', age: 22, gender: 'Female', preference: 'Any', faculty: 'Architecture', year: '3', bio: 'Designing dreams one blueprint at a time. Passionate about sustainable spaces and sunsets from rooftops.', photo: 'https://i.pravatar.cc/300?img=47', interests: ['Art', 'Photography', 'Travel'], likes: [], passes: [], blocked: [] },
+                { id: 'u10', password: 'p', name: 'Shemaya', email: 'shemaya@example.com', age: 20, gender: 'Female', preference: 'Male', faculty: 'Business Administration', year: '2', bio: 'Future CEO in the making. Love spontaneous road trips and deep conversations over coffee.', photo: 'https://i.pravatar.cc/300?img=44', interests: ['Food', 'Music', 'Fitness'], likes: [], passes: [], blocked: [] },
+                { id: 'u11', password: 'p', name: 'Ishadi', email: 'ishadi@example.com', age: 21, gender: 'Female', preference: 'Any', faculty: 'Psychology', year: '3', bio: 'Understanding minds and collecting sunrises. I believe kindness is the coolest personality trait.', photo: 'https://i.pravatar.cc/300?img=49', interests: ['Reading', 'Dancing', 'Coding'], likes: [], passes: [], blocked: [] }
+            ];
+            DB.saveUsers(users); // also generates initial CSV snapshot
+        }
+
+        // Check for logged-in user
+        const currentUserId = DB.getCurrentUserId();
+        if (currentUserId) {
+            currentUser = users.find(u => u.id === currentUserId);
+            if (currentUser) {
+                updateMatchNotification();
+                currentUser.lastSeen = new Date().toISOString();
+                updateAndSaveCurrentUser();
+                userNameSpan.textContent = currentUser.name;
+                showPage('dashboardPage');
+            } else {
+                showPage('loginPage');
+            }
+        } else {
+            showPage('loginPage');
+        }
+
+        // Dark mode persistence
+        if (DB.getTheme() === 'dark') {
+            body.classList.add('dark');
+            modeToggleButton.textContent = '☀️ Light';
+        }
+        
+        // Set initial background
+        const activePage = document.querySelector('.container.active');
+        if (activePage) {
+            body.style.background = window.getComputedStyle(activePage).background;
+        }
+    }
+
+    // --- NAVIGATION ---
+    window.showPage = (pageId) => {
+        allPages.forEach(page => {
+            page.classList.remove('active');
+        });
+        const newPage = document.getElementById(pageId);
+        if (newPage) {
+            newPage.classList.add('active');
+            // Update body background based on the active page
+            body.style.background = window.getComputedStyle(newPage).background;
+        }
+    }
+
+    function updateMatchNotification() {
+        const badge = document.getElementById('matchNotificationBadge');
+        if (!currentUser || !currentUser.newMatches || currentUser.newMatches.length === 0) {
+            badge.style.display = 'none';
+            return;
+        }
+
+        const newMatchCount = currentUser.newMatches.length;
+        badge.textContent = newMatchCount > 9 ? '9+' : newMatchCount;
+        badge.style.display = 'flex';
+    }
+
+    // --- UI & THEME ---
+    modeToggleButton.addEventListener('click', () => {
+        body.classList.toggle('dark');
+        if (body.classList.contains('dark')) {
+            modeToggleButton.textContent = '☀️ Light';
+            DB.setTheme('dark');
+        } else {
+            modeToggleButton.textContent = '🌙 Dark';
+            DB.setTheme('light');
+        }
+        // Re-apply background after theme change
+        const activePage = document.querySelector('.container.active');
+        if (activePage) {
+            body.style.background = window.getComputedStyle(activePage).background;
+        }
+    });
+
+    // --- UI ENHANCEMENTS (Password Strength) ---
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
+
+    function checkPasswordStrength(password) {
+        let score = 0;
+        if (!password) return 0;
+        if (password.length > 7) score++; // Length > 7
+        if (/[A-Z]/.test(password)) score++; // Has uppercase
+        if (/[0-9]/.test(password)) score++; // Has numbers
+        if (/[^A-Za-z0-9]/.test(password)) score++; // Has special character
+        return score;
+    }
+
+    function updateStrengthIndicator(strength) {
+        const strengthLevels = {
+            0: { text: '', width: '0%', color: '#ddd' },
+            1: { text: 'Weak', width: '25%', color: '#e74c3c' },
+            2: { text: 'Medium', width: '50%', color: '#f39c12' },
+            3: { text: 'Strong', width: '75%', color: '#f1c40f' },
+            4: { text: 'Very Strong', width: '100%', color: '#2ecc71' }
+        };
+        const level = strengthLevels[strength] || strengthLevels[0];
+        
+        if (strengthBar) {
+            strengthBar.style.width = level.width;
+            strengthBar.style.backgroundColor = level.color;
+        }
+        if (strengthText) {
+            strengthText.textContent = level.text;
+        }
+    }
+
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const strength = checkPasswordStrength(password);
+            updateStrengthIndicator(strength);
+        });
+    }
+
+    window.togglePassword = (icon) => {
+        const input = icon.previousElementSibling;
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "🙈"; // Icon for 'Hide'
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️"; // Icon for 'Show'
+        }
+    }
+
+    // --- AUTHENTICATION ---
+    window.login = () => {
+        const identifier = document.getElementById('loginIdentifier').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        const user = users.find(u => (u.email === identifier || u.id === identifier) && u.password === pass);
+        if (user) {
+            currentUser = user;
+            currentUser.lastSeen = new Date().toISOString();
+            updateAndSaveCurrentUser();
+            DB.setCurrentUserId(user.id);
+            userNameSpan.textContent = user.name;
+            showPage('dashboardPage');
+        } else {
+            alert('Invalid credentials. Please check your Email/ID and Password.');
+        }
+    }
+
+    window.logout = () => {
+        currentUser = null;
+        DB.setCurrentUserId(null);
+        showPage('loginPage');
+    }
+
+    window.deleteAccount = () => {
+        if (!currentUser) return;
+
+        const confirmation = confirm("Are you sure you want to delete your account? This action is irreversible.");
+        if (!confirmation) {
+            return;
+        }
+
+        const passwordCheck = prompt("Please enter your password to confirm deletion:");
+        if (passwordCheck === null) { // User clicked cancel
+            return;
+        }
+
+        if (passwordCheck !== currentUser.password) {
+            alert("Incorrect password. Account deletion cancelled.");
+            return;
+        }
+
+        const userIdToDelete = currentUser.id;
+
+        // Filter out the current user
+        users = users.filter(user => user.id !== userIdToDelete);
+
+        // Clean up references in other users (likes, passes, matches, etc.)
+        users.forEach(user => {
+            if (user.likes) user.likes = user.likes.filter(id => id !== userIdToDelete);
+            if (user.passes) user.passes = user.passes.filter(id => id !== userIdToDelete);
+            if (user.blocked) user.blocked = user.blocked.filter(id => id !== userIdToDelete);
+            if (user.newMatches) user.newMatches = user.newMatches.filter(id => id !== userIdToDelete);
+            if (user.unreadMessages) delete user.unreadMessages[userIdToDelete];
+        });
+
+        DB.saveUsers(users);
+
+        // Also remove any chats involving this user
+        const allChats = DB.getChats();
+        for (const chatId in allChats) {
+            const participants = chatId.split('_');
+            if (participants.includes(userIdToDelete)) {
+                delete allChats[chatId];
+            }
+        }
+        DB.saveChats(allChats);
+
+        alert("Your account has been successfully deleted.");
+        logout(); // Log out and go to login page
+    }
+
+    window.showSettingsPage = () => {
+        if (!currentUser) return;
+        // Pre-fill current email and clear password fields
+        document.getElementById('newEmail').value = currentUser.email || '';
+        document.getElementById('currentPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmNewPass').value = '';
+        showPage('settingsPage');
+    }
+
+    window.saveSettings = () => {
+        if (!currentUser) return;
+
+        const currentPass = document.getElementById('currentPass').value;
+        const newEmail = document.getElementById('newEmail').value.trim();
+        const newPass = document.getElementById('newPass').value;
+        const confirmNewPass = document.getElementById('confirmNewPass').value;
+
+        if (!currentPass) {
+            alert('Please enter your current password to make changes.');
+            return;
+        }
+
+        if (currentPass !== currentUser.password) {
+            alert('Incorrect current password.');
+            return;
+        }
+
+        let changesMade = false;
+
+        // --- Update Email ---
+        if (newEmail && newEmail !== currentUser.email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(newEmail)) {
+                alert('Please enter a valid new email address.');
+                return;
+            }
+            if (users.some(u => u.email === newEmail && u.id !== currentUser.id)) {
+                alert('This email address is already registered.');
+                return;
+            }
+            currentUser.email = newEmail;
+            changesMade = true;
+        }
+
+        // --- Update Password ---
+        if (newPass) {
+            if (newPass !== confirmNewPass) {
+                alert('New passwords do not match.');
+                return;
+            }
+            currentUser.password = newPass;
+            changesMade = true;
+        }
+
+        if (changesMade) {
+            updateAndSaveCurrentUser();
+            alert('Your settings have been updated successfully.');
+            showPage('dashboardPage');
+        } else {
+            alert('No changes were made.');
+        }
+    }
+
+    window.forgotPassword = () => {
+        const identifier = prompt("Enter your Email or University ID to recover your password:");
+        if (identifier) {
+            const user = users.find(u => u.email === identifier.trim() || u.id === identifier.trim());
+            if (user) {
+                alert(`Your password is: ${user.password}`);
+            } else {
+                alert("User not found.");
+            }
+        }
+    }
+
+    window.signup = () => {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const age = document.getElementById('age').value;
+        const gender = document.getElementById('gender').value;
+        const pref = document.getElementById('pref').value;
+        const faculty = document.getElementById('faculty').value.trim();
+        const year = document.getElementById('year').value;
+        const studentID = document.getElementById('studentID').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!name || !email || !age || !faculty || !year || !studentID || !password || !confirmPassword) {
+            alert('Please fill all fields.');
+            return;
+        }
+
+        // Simple email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+        if (users.some(u => u.id === studentID)) {
+            alert('Student ID already exists.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match.');
+            return;
+        }
+
+        if (users.some(u => u.email === email)) {
+            alert('Email already registered.');
+            return;
+        }
+
+        // Store user data temporarily
+        pendingUser = {
+            id: studentID, password, name, email, age, gender, preference: pref, faculty, year,
+            bio: '', photo: 'https://i.pravatar.cc/300', interests: [], likes: [], passes: [], blocked: []
+        };
+
+        // Go to verification page
+        showPage('verificationPage');
+    }
+
+    window.verifyCode = () => {
+        // This function is now simplified for the "Simulate Email Verification" button
+        if (pendingUser) {
+            users.push(pendingUser);
+            DB.saveUsers(users);
+            
+            // Log in the new user and go to profile setup
+            currentUser = pendingUser;
+            DB.setCurrentUserId(currentUser.id);
+            alert('Signup successful! Please set up your profile.');
+            showPage('profilePage');
+            pendingUser = null; // Clear pending user
+        } else {
+            // This might happen if the user refreshes the verification page
+            alert('Registration session expired. Please sign up again.');
+            showPage('signupPage');
+        }
+    }
+
+    window.resendVerification = () => {
+        const resendBtn = document.getElementById('resendVerificationBtn');
+        if (!resendBtn) return;
+
+        let cooldown = 30; // 30 seconds cooldown
+        resendBtn.disabled = true;
+        alert("A new verification link has been sent (simulation).");
+
+        const interval = setInterval(() => {
+            cooldown--;
+            resendBtn.textContent = `Resend in ${cooldown}s`;
+            if (cooldown <= 0) {
+                clearInterval(interval);
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Resend Link';
+            }
+        }, 1000);
+    }
+
+    // --- PROFILE SETUP ---
+    let photoDataUrl = null;
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const preview = document.getElementById('preview');
+
+    window.startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+            alert('Could not access camera. Please check permissions.');
+        }
+    }
+
+    window.takePhoto = () => {
+        if (!video.srcObject) {
+            alert("Camera not started.");
+            return;
+        }
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        photoDataUrl = canvas.toDataURL('image/png');
+        preview.src = photoDataUrl;
+        preview.style.display = 'block';
+        video.style.display = 'none';
+        // Stop camera stream
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+    }
+
+    window.checkFileSize = () => {
+        const file = document.getElementById('upload').files[0];
+        if (file && file.size > 2 * 1024 * 1024) { // 2MB
+            alert('File is too large. Please select an image under 2MB.');
+            document.getElementById('upload').value = ''; // Clear selection
+            return;
+        }
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                photoDataUrl = e.target.result;
+                preview.src = photoDataUrl;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    window.saveProfile = () => {
+        if (!currentUser) return;
+        
+        currentUser.bio = document.getElementById('bio').value.trim();
+        currentUser.insta = document.getElementById('insta').value.trim();
+        
+        const interests = [];
+        document.querySelectorAll('.interests-grid input[type="checkbox"]:checked').forEach(cb => {
+            interests.push(cb.value);
+        });
+        currentUser.interests = interests;
+
+        if (photoDataUrl) {
+            currentUser.photo = photoDataUrl;
+        }
+
+        updateAndSaveCurrentUser(); // saves localStorage + syncs CSV
+
+        showToast('Profile saved & CSV updated ✓');
+        userNameSpan.textContent = currentUser.name;
+        showPage('dashboardPage');
+    }
+
+    // --- SWIPING ---
+    window.startSwipe = () => {
+        if (!currentUser) return;
+        
+        const alreadySwiped = [...currentUser.likes, ...currentUser.passes];
+        
+        swipeQueue = users.filter(user => {
+            if (user.id === currentUser.id) return false;
+            if (alreadySwiped.includes(user.id)) return false;
+
+            // New blocking logic
+            if (currentUser.blocked && currentUser.blocked.includes(user.id)) return false; // Don't show users I've blocked
+            if (user.blocked && user.blocked.includes(currentUser.id)) return false; // Don't show users who have blocked me
+
+            if (currentUser.preference !== 'Any' && currentUser.preference !== user.gender) return false;
+            if (user.preference !== 'Any' && user.preference !== currentUser.gender) return false;
+            return true;
+        });
+
+        showPage('swipePage');
+        loadNextSwipeCard();
+    }
+
+    function loadNextSwipeCard() {
+        const swipeCardContainer = document.getElementById('swipeCard');
+        if (swipeQueue.length > 0) {
+            currentSwipeUser = swipeQueue.shift();
+            swipeCardContainer.innerHTML = `
+                <div class="card">
+                    <h3>${currentSwipeUser.name}, ${currentSwipeUser.age}</h3>
+                    <p><em>${currentSwipeUser.faculty}</em></p>
+                    <img src="${currentSwipeUser.photo}" alt="${currentSwipeUser.name}">
+                    <p>${currentSwipeUser.bio}</p>
+                    <p><strong>Interests:</strong> ${currentSwipeUser.interests.join(', ')}</p>
+                    <div class="swipe-card-actions">
+                        <button onclick="initiateContact('chat')" title="Chat">💬</button>
+                        <button onclick="initiateContact('voice')" title="Voice Call">📞</button>
+                        <button onclick="initiateContact('video')" title="Video Call">📹</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            swipeCardContainer.innerHTML = `<div class="card"><p>No more people to show right now. Check back later!</p></div>`;
+            currentSwipeUser = null;
+        }
+    }
+
+    window.likeUser = () => {
+        if (!currentSwipeUser || !currentUser) return;
+        
+        currentUser.likes.push(currentSwipeUser.id);
+        
+        const otherUser = users.find(u => u.id === currentSwipeUser.id);
+        if (otherUser && otherUser.likes.includes(currentUser.id)) {
+            alert(`It's a match with ${otherUser.name}!`);
+            // Add to new matches for notification
+            if (!currentUser.newMatches) {
+                currentUser.newMatches = [];
+            }
+            currentUser.newMatches.push(otherUser.id);
+            updateMatchNotification();
+        }
+        
+        updateAndSaveCurrentUser();
+        showToast('CSV updated ✓');
+        loadNextSwipeCard();
+    }
+
+    window.passUser = () => {
+        if (!currentSwipeUser || !currentUser) return;
+        currentUser.passes.push(currentSwipeUser.id);
+        updateAndSaveCurrentUser();
+        showToast('CSV updated ✓');
+        loadNextSwipeCard();
+    }
+
+    function updateAndSaveCurrentUser() {
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+            users[userIndex] = currentUser;
+            DB.saveUsers(users); // also auto-syncs CSV
+        }
+    }
+
+    window.handleCSVImport = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        DB.importCSVFromFile(file, (importedUsers) => {
+            users = importedUsers;
+            // Try to restore current user from imported data
+            if (currentUser) {
+                const updated = users.find(u => u.id === currentUser.id);
+                if (updated) currentUser = updated;
+            }
+            alert(`CSV imported successfully! ${importedUsers.length} profiles loaded.`);
+            // Reset file input so same file can be re-imported
+            event.target.value = '';
+        });
+    }
+
+    // --- MATCHES & CHAT ---
+    let currentMatchTab = 'matches'; // 'matches' | 'all'
+
+    window.switchMatchTab = (tab) => {
+        currentMatchTab = tab;
+        const tabMatches = document.getElementById('tabMatches');
+        const tabAll     = document.getElementById('tabAll');
+        const filters    = document.getElementById('matchFilters');
+
+        const activeStyle   = '';
+        const inactiveStyle = 'background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;';
+
+        if (tab === 'matches') {
+            tabMatches.style.cssText = activeStyle;
+            tabAll.style.cssText     = inactiveStyle;
+            filters.style.display    = 'none';
+        } else {
+            tabAll.style.cssText     = activeStyle;
+            tabMatches.style.cssText = inactiveStyle;
+            filters.style.display    = 'flex';
+            // Populate faculty filter dynamically from saved profiles
+            populateFacultyFilter();
+        }
+        document.getElementById('matchSearchInput').value = '';
+        filterMatches();
+    }
+
+    function populateFacultyFilter() {
+        const sel = document.getElementById('filterFaculty');
+        const faculties = [...new Set(users.map(u => u.faculty).filter(Boolean))].sort();
+        sel.innerHTML = '<option value="">Any Faculty</option>';
+        faculties.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f; opt.textContent = f;
+            sel.appendChild(opt);
+        });
+    }
+
+    function renderMatches(profilesToRender, isAllTab) {
+        const matchListContainer = document.getElementById('matchList');
+        matchListContainer.innerHTML = '';
+        const countEl = document.getElementById('matchResultCount');
+
+        if (profilesToRender.length === 0) {
+            matchListContainer.innerHTML = `
+                <div style="text-align:center;padding:30px 10px;opacity:0.6;">
+                    <div style="font-size:40px;margin-bottom:10px;">${isAllTab ? '🔍' : '💔'}</div>
+                    <p>${isAllTab ? 'No profiles match your search.' : 'No matches yet. Start swiping!'}</p>
+                </div>`;
+            countEl.textContent = '';
+            return;
+        }
+
+        countEl.textContent = profilesToRender.length + ' profile' + (profilesToRender.length !== 1 ? 's' : '') + ' found';
+
+        profilesToRender.forEach(profile => {
+            const compat = calculateCompatibility(currentUser, profile);
+            const lastSeen = formatLastSeen(profile.lastSeen);
+            const isMutualMatch = currentUser.likes.includes(profile.id) && profile.likes && profile.likes.includes(currentUser.id);
+            const iLiked  = currentUser.likes.includes(profile.id);
+            const unreadCount = (currentUser.unreadMessages && currentUser.unreadMessages[profile.id]) || 0;
+            const unreadBadge = unreadCount > 0
+                ? `<span class="chat-notification-badge">${unreadCount > 9 ? '9+' : unreadCount}</span>` : '';
+
+            const matchBadge = isMutualMatch
+                ? `<span style="display:inline-block;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;margin-bottom:6px;letter-spacing:0.05em;">💞 MATCHED</span>` : '';
+
+            const likeStatus = !isMutualMatch && iLiked
+                ? `<span style="display:inline-block;background:rgba(232,99,122,0.12);color:var(--rose);font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;margin-bottom:6px;">❤️ You liked</span>` : '';
+
+            const interestTags = (profile.interests || []).map(i =>
+                `<span style="display:inline-block;background:rgba(232,99,122,0.10);color:var(--rose-deep);font-size:11px;padding:3px 9px;border-radius:50px;margin:2px;font-weight:500;">${i}</span>`
+            ).join('');
+
+            const chatBtn = isMutualMatch
+                ? `<button onclick="startChat('${profile.id}')" style="flex:1;margin:0;padding:9px;font-size:13px;">💬 Chat</button>` : '';
+
+            const likeBtn = !iLiked
+                ? `<button onclick="quickLike('${profile.id}')" style="flex:1;margin:0;padding:9px;font-size:13px;background:rgba(232,99,122,0.12);border:1.5px solid rgba(232,99,122,0.3);color:var(--rose);box-shadow:none;">❤️ Like</button>` : '';
+
+            matchListContainer.innerHTML += `
+                <div class="card" style="text-align:left;">
+                    ${unreadBadge}
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                        <img src="${profile.photo || 'https://i.pravatar.cc/80'}" alt="${profile.name}"
+                            style="width:58px;height:58px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(232,99,122,0.3);margin:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
+                                <strong style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--rose-deep);">${profile.name}</strong>
+                                <span style="font-size:12px;opacity:0.65;">${profile.age ? profile.age + ' yrs' : ''}</span>
+                            </div>
+                            <div style="font-size:12px;opacity:0.7;margin-top:2px;">${profile.faculty || ''}${profile.year ? ' · Year ' + profile.year : ''}</div>
+                            <div style="font-size:11px;margin-top:2px;">${lastSeen}</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:6px;">${matchBadge}${likeStatus}</div>
+                    ${profile.bio ? `<p style="font-size:13px;margin-bottom:8px;line-height:1.5;">${profile.bio}</p>` : ''}
+                    ${interestTags ? `<div style="margin-bottom:10px;">${interestTags}</div>` : ''}
+                    <div style="margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                            <span style="opacity:0.65;">Compatibility</span>
+                            <strong style="color:var(--rose-deep);">${compat}%</strong>
+                        </div>
+                        <div class="bar"><div class="fill" style="width:${compat}%;"></div></div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:4px;">
+                        ${chatBtn}${likeBtn}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.quickLike = (userId) => {
+        if (!currentUser) return;
+        if (!currentUser.likes.includes(userId)) {
+            currentUser.likes.push(userId);
+            const otherUser = users.find(u => u.id === userId);
+            if (otherUser && otherUser.likes && otherUser.likes.includes(currentUser.id)) {
+                showToast('🎉 It\'s a match with ' + otherUser.name + '!');
+                if (!currentUser.newMatches) currentUser.newMatches = [];
+                currentUser.newMatches.push(userId);
+                updateMatchNotification();
+            } else {
+                showToast('❤️ Liked!');
+            }
+            updateAndSaveCurrentUser();
+            filterMatches(); // re-render to reflect new like state
+        }
+    }
+
+    window.filterMatches = () => {
+        const term    = (document.getElementById('matchSearchInput').value || '').toLowerCase().trim();
+        const gender  = (document.getElementById('filterGender')  || {}).value || '';
+        const faculty = (document.getElementById('filterFaculty') || {}).value || '';
+        const year    = (document.getElementById('filterYear')    || {}).value || '';
+
+        let pool;
+        const isAllTab = currentMatchTab === 'all';
+
+        if (isAllTab) {
+            // All profiles except self, unblocked
+            pool = users.filter(u => {
+                if (u.id === currentUser.id) return false;
+                if (currentUser.blocked && currentUser.blocked.includes(u.id)) return false;
+                if (u.blocked && u.blocked.includes(currentUser.id)) return false;
+                return true;
+            });
+        } else {
+            // Only mutual matches
+            pool = users.filter(u =>
+                currentUser.likes.includes(u.id) && u.likes && u.likes.includes(currentUser.id)
+            );
+        }
+
+        // Text search across name, faculty, bio, interests
+        if (term) {
+            pool = pool.filter(u => {
+                const haystack = [
+                    u.name, u.faculty, u.bio, u.year,
+                    ...(u.interests || [])
+                ].join(' ').toLowerCase();
+                return haystack.includes(term);
+            });
+        }
+
+        // Dropdown filters (only meaningful in All tab)
+        if (gender)  pool = pool.filter(u => u.gender  === gender);
+        if (faculty) pool = pool.filter(u => u.faculty === faculty);
+        if (year)    pool = pool.filter(u => String(u.year) === String(year));
+
+        // Sort: mutual matches first, then by compatibility
+        pool.sort((a, b) => {
+            const aMatch = currentUser.likes.includes(a.id) && a.likes && a.likes.includes(currentUser.id);
+            const bMatch = currentUser.likes.includes(b.id) && b.likes && b.likes.includes(currentUser.id);
+            if (aMatch && !bMatch) return -1;
+            if (!aMatch && bMatch) return 1;
+            return calculateCompatibility(currentUser, b) - calculateCompatibility(currentUser, a);
+        });
+
+        renderMatches(pool, isAllTab);
+    }
+
+    window.initiateContact = (type) => {
+        if (!currentUser || !currentSwipeUser) return;
+
+        const otherUser = users.find(u => u.id === currentSwipeUser.id);
+        const isMatch = currentUser.likes.includes(currentSwipeUser.id) && 
+                        otherUser && otherUser.likes.includes(currentUser.id);
+
+        if (isMatch) {
+            switch (type) {
+                case 'chat':
+                    startChat(currentSwipeUser.id);
+                    break;
+                case 'voice':
+                    startVoiceCall(currentSwipeUser.id);
+                    break;
+                case 'video':
+                    startVideoCall(currentSwipeUser.id);
+                    break;
+            }
+        } else {
+            alert(`You need to match with ${currentSwipeUser.name} to contact them. Press 'Like' to show your interest!`);
+        }
+    }
+
+    window.showMatches = () => {
+        if (!currentUser) return;
+
+        // Clear new match notifications
+        if (currentUser.newMatches && currentUser.newMatches.length > 0) {
+            currentUser.newMatches = [];
+            updateAndSaveCurrentUser();
+            updateMatchNotification();
+        }
+
+        showPage('matchPage');
+
+        // Reset to Matches tab
+        currentMatchTab = 'matches';
+        document.getElementById('tabMatches').style.cssText = '';
+        document.getElementById('tabAll').style.cssText = 'background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;';
+        document.getElementById('matchFilters').style.display = 'none';
+        document.getElementById('matchSearchInput').value = '';
+        filterMatches();
+    }
+    
+    function calculateCompatibility(user1, user2) {
+        const commonInterests = user1.interests.filter(i => user2.interests.includes(i));
+        const maxInterests = Math.max(user1.interests.length, user2.interests.length);
+        if (maxInterests === 0) return 20; // Base compatibility
+        const score = (commonInterests.length / maxInterests) * 100;
+        return Math.min(100, Math.round(score) + 20); // Add base and cap at 100
+    }
+
+    function createMessageHTML(message) {
+        if (!currentUser || !currentChatUser) return '';
+
+        const isCurrentUser = message.senderId === currentUser.id;
+        const messageClass = isCurrentUser ? 'sent' : 'received';
+        const time = formatTimestamp(message.timestamp);
+
+        return `
+            <div class="message-container ${messageClass}">
+                <div class="message-bubble">
+                    <p class="message-text">${message.text}</p>
+                    <span class="message-time">${time}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    window.startChat = (userId) => {
+        currentChatUser = users.find(u => u.id === userId);
+        if (!currentChatUser || !currentUser) return;
+
+        // Clear unread messages for this chat
+        if (currentUser.unreadMessages && currentUser.unreadMessages[userId]) {
+            delete currentUser.unreadMessages[userId];
+            updateAndSaveCurrentUser();
+        }
+        
+        // Setup header with name and call buttons
+        document.getElementById('chatPartnerName').textContent = `${currentChatUser.name}`;
+        const callButtonsContainer = document.getElementById('callButtons');
+        callButtonsContainer.innerHTML = `
+            <button onclick="startVoiceCall('${currentChatUser.id}')" title="Voice Call">📞</button>
+            <button onclick="startVideoCall('${currentChatUser.id}')" title="Video Call">📹</button>
+            <button class="block-btn" onclick="blockUser('${currentChatUser.id}')" title="Block User">🚫</button>
+        `;
+
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML = ''; // Clear the box
+        typingIndicator.style.display = 'none'; // Ensure it's hidden
+
+        const chatId = getChatId(currentUser.id, currentChatUser.id);
+        const allChats = DB.getChats();
+        const chatHistory = allChats[chatId] || [];
+
+        if (chatHistory.length === 0) {
+            chatBox.innerHTML = `<p><em>This is the beginning of your conversation with ${currentChatUser.name}.</em></p>`;
+        } else {
+            chatHistory.forEach(message => {
+                chatBox.innerHTML += createMessageHTML(message);
+            });
+        }
+        
+        chatBox.scrollTop = chatBox.scrollHeight;
+        showPage('chatPage');
+    }
+
+    window.sendMessage = () => {
+        const chatInput = document.getElementById('chatInput');
+        const messageText = chatInput.value.trim();
+
+        if (messageText && currentUser && currentChatUser) {
+            const chatId = getChatId(currentUser.id, currentChatUser.id);
+            const allChats = DB.getChats();
+            if (!allChats[chatId]) {
+                allChats[chatId] = [];
+            }
+
+            // 1. Add user's message
+            const myMessage = {
+                senderId: currentUser.id,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
+            allChats[chatId].push(myMessage);
+            DB.saveChats(allChats); // Save after adding user's message
+
+            // 2. Update UI for user's message
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox.querySelector('em')) { // Remove initial message if it exists
+                chatBox.innerHTML = '';
+            }
+            chatBox.insertAdjacentHTML('beforeend', createMessageHTML(myMessage));
+            chatInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // 3. Show typing indicator and simulate reply
+            typingIndicator.style.display = 'block';
+            typingIndicator.textContent = `${currentChatUser.name} is typing...`;
+
+            setTimeout(() => {
+                typingIndicator.style.display = 'none'; // Hide indicator
+
+                const replyText = "Got it!";
+                const replyMessage = { senderId: currentChatUser.id, text: replyText, timestamp: new Date().toISOString() };
+                allChats[chatId].push(replyMessage);
+                DB.saveChats(allChats); // Save again after adding the reply
+
+                // In this simulation, the reply is "unread" until the user re-enters the chat.
+                if (!currentUser.unreadMessages) {
+                    currentUser.unreadMessages = {};
+                }
+                currentUser.unreadMessages[currentChatUser.id] = (currentUser.unreadMessages[currentChatUser.id] || 0) + 1;
+                updateAndSaveCurrentUser();
+
+                chatBox.insertAdjacentHTML('beforeend', createMessageHTML(replyMessage));
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1500);
+        }
+    }
+
+    window.startVoiceCall = (userId) => {
+        const partner = users.find(u => u.id === userId);
+        if (!partner) return;
+        const overlay = document.getElementById('callOverlay');
+        document.getElementById('callPartnerAvatar').src = partner.photo;
+        document.getElementById('callStatus').textContent = 'Voice Calling...';
+        document.getElementById('callPartnerNameOverlay').textContent = partner.name;
+        overlay.style.display = 'flex';
+    }
+
+    window.startVideoCall = (userId) => {
+        const partner = users.find(u => u.id === userId);
+        if (!partner) return;
+        const overlay = document.getElementById('callOverlay');
+        document.getElementById('callPartnerAvatar').src = partner.photo;
+        document.getElementById('callStatus').textContent = 'Video Calling...';
+        document.getElementById('callPartnerNameOverlay').textContent = partner.name;
+        overlay.style.display = 'flex';
+    }
+
+    window.blockUser = (userIdToBlock) => {
+        if (!currentUser || !userIdToBlock) return;
+
+        const confirmation = confirm(`Are you sure you want to block this user? You will be unmatched and will no longer see each other.`);
+        if (!confirmation) {
+            return;
+        }
+
+        // Ask if user wants to report as well
+        const wantToReport = confirm("Do you also want to report this user to the admins for inappropriate behavior?");
+        if (wantToReport) {
+            alert("User reported. Thank you for helping keep our community safe.");
+        }
+
+        // Add to current user's blocked list
+        if (!currentUser.blocked) {
+            currentUser.blocked = [];
+        }
+        if (!currentUser.blocked.includes(userIdToBlock)) {
+            currentUser.blocked.push(userIdToBlock);
+        }
+
+        // Remove from likes/matches. A block implies un-matching.
+        currentUser.likes = currentUser.likes.filter(id => id !== userIdToBlock);
+        
+        // Also remove the current user from the other person's likes to break the match
+        const blockedUser = users.find(u => u.id === userIdToBlock);
+        if (blockedUser) {
+            blockedUser.likes = blockedUser.likes.filter(id => id !== currentUser.id);
+        }
+
+        DB.saveUsers(users); // Save the change to the blocked user
+        updateAndSaveCurrentUser(); // Save the change to the current user
+
+        alert("User has been blocked.");
+        showMatches(); // Go back to the matches page, which will now be updated.
+    }
+
+    window.hangUp = () => {
+        document.getElementById('callOverlay').style.display = 'none';
+    }
+
+
+    // --- KICKSTART THE APP ---
+    initializeApp();
+});
+</script>
+</body>
+</html>
