@@ -1,329 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Campus Match - Dark/Light Mode</title>
-<style>
-/* Full-screen animated gradient background */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  min-height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: rainbowBG 15s ease infinite;
-  background: linear-gradient(45deg, #ff3c6f, #ff7a9a, #ffb3c6, #ffd6e0, #a3c1ff, #9cffb3, #fffc9c);
-  background-size: 1400% 1400%;
-  color: #333;
-  transition: background 0.5s, color 0.5s;
-  position: relative;
-}
-
-/* Gradient animation */
-@keyframes rainbowBG {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-
-/* Floating hearts animation */
-.heart {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: red;
-  transform: rotate(45deg);
-  animation: float linear infinite;
-  opacity: 0.7;
-  border-radius: 50%;
-  z-index:0;
-}
-.heart::before, .heart::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: red;
-  border-radius: 50%;
-}
-.heart::before { top:-10px; left:0; }
-.heart::after { left:10px; top:0; }
-@keyframes float {
-  0% { transform: translateY(0) rotate(45deg); opacity: 0.7; }
-  50% { opacity: 1; }
-  100% { transform: translateY(-700px) rotate(45deg); opacity: 0; }
-}
-
-/* Dark mode */
-body.dark {
-  background: #1a1a1a;
-  color: #f0f0f0;
-}
-
-/* Toggle Button */
-#modeToggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #ff3c6f;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  cursor: pointer;
-  font-size: 20px;
-  z-index: 100;
-  transition: background 0.3s, transform 0.2s;
-}
-#modeToggle:hover {
-  background: #ff1a4f;
-  transform: scale(1.1);
-}
-
-/* Container & fade animation */
-.container {
-  width: 90%;
-  max-width: 500px;
-  background: rgba(255,255,255,0.95);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-  display: none;
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 0.5s, transform 0.5s, background 0.5s, color 0.5s;
-  z-index:1;
-  position: relative;
-}
-body.dark .container { background: rgba(40,40,40,0.95); color: #f0f0f0; }
-.container.active {
-  display: block;
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Form elements */
-input, select, textarea, button {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-body.dark input, body.dark select, body.dark textarea { background: #333; color: #f0f0f0; border:1px solid #555; }
-
-/* Buttons with gradient & hover scale */
-button:not(#modeToggle) {
-  background: linear-gradient(135deg, #ff3c6f, #ff7a9a);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-button:not(#modeToggle):hover {
-  background: linear-gradient(135deg, #ff1a4f, #ff5a7a);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* Match cards */
-.card {
-  background: #ffe6f0;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0px 3px 10px rgba(0,0,0,0.2);
-  border: 2px solid #ff4d88;
-  transition: transform 0.3s, box-shadow 0.3s, background 0.5s, color 0.5s;
-}
-body.dark .card { background:#5a1a2b; color:#f0f0f0; border:2px solid #ff6b9e;}
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 6px 15px rgba(0,0,0,0.3);
-}
-
-/* Checkbox group */
-.checkbox-group label { display: block; }
-
-/* Progress bar */
-.progress-bar-bg {
-  background:#ffd6e0; border-radius:8px; overflow:hidden; height:20px; margin:5px 0;
-}
-body.dark .progress-bar-bg { background:#553a4c; }
-.progress-bar-fill { background:#ff4d88; height:100%; transition: width 1s; }
-
-</style>
+<title>Campus Match</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Dark/Light Mode Toggle -->
-<button id="modeToggle">🌙</button>
+<!-- Animated Watermark -->
+<div class="watermark">Campus Match</div>
 
-<!-- Floating hearts -->
-<div class="heart" style="left:10%; animation-duration:6s;"></div>
-<div class="heart" style="left:30%; animation-duration:5s;"></div>
-<div class="heart" style="left:50%; animation-duration:7s;"></div>
-<div class="heart" style="left:70%; animation-duration:6.5s;"></div>
-<div class="heart" style="left:90%; animation-duration:8s;"></div>
+<!-- Dark/Light Toggle -->
+<button id="modeToggle">🌙 Dark</button>
 
-<!-- Login Page -->
+<div class="heart" style="left:15%; animation-delay: 0s;"></div>
+<div class="heart" style="left:35%; animation-delay: 2s;"></div>
+<div class="heart" style="left:55%; animation-delay: 4s;"></div>
+<div class="heart" style="left:75%; animation-delay: 6s;"></div>
+
+<!-- LOGIN -->
 <div id="loginPage" class="container active">
-  <h2>Login</h2>
-  <input type="text" id="loginStudentID" placeholder="University Student ID" required>
-  <input type="password" id="loginPassword" placeholder="Password" required>
-  <button onclick="login()">❤️ Login</button>
-  <p>Don't have an account? <a href="#" onclick="showPage('signupPage')">Sign up</a></p>
+<h2>Login</h2>
+<input id="loginID" placeholder="User Id">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p>No account? <a onclick="showPage('signupPage')" style="cursor:pointer">Signup</a></p>
 </div>
 
-<!-- Signup Page -->
+<!-- SIGNUP -->
 <div id="signupPage" class="container">
-  <h2>Sign Up</h2>
-  <input type="text" id="signupName" placeholder="Full Name" required>
-  <input type="number" id="signupAge" placeholder="Age" required>
-  <label>Gender:</label>
-  <select id="signupGender" required>
-    <option value="">Select</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-  </select>
-  <label>Interested in:</label>
-  <select id="signupPrefGender" required>
-    <option value="">Select</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-    <option value="Any">Any</option>
-  </select>
-  <input type="text" id="signupFaculty" placeholder="Faculty" required>
-  <input type="text" id="signupYear" placeholder="Year" required>
-  <input type="text" id="signupStudentID" placeholder="University Student ID" required>
-  <input type="password" id="signupPassword" placeholder="Password" required>
-  <button onclick="signup()">💌 Sign Up</button>
-  <p>Already have an account? <a href="#" onclick="showPage('loginPage')">Login</a></p>
+<h2 style="text-align:center">Signup</h2>
+<input id="name" placeholder="Full Name">
+<input id="age" placeholder="Age">
+<select id="gender"><option>Male</option><option>Female</option></select>
+<select id="pref"><option>Male</option><option>Female</option><option>Any</option></select>
+<input id="faculty" placeholder="Faculty (e.g. Computer Science)">
+<input id="year" placeholder="Year">
+<input id="studentID" placeholder="Student ID">
+<input id="password" type="password" placeholder="Password">
+<button onclick="signup()">Signup</button>
 </div>
 
-<!-- Profile Setup -->
+<!-- PROFILE -->
 <div id="profilePage" class="container">
-  <h2>Profile Setup</h2>
-  <textarea id="profileBio" placeholder="Short bio about yourself" required></textarea>
-  <label>Upload Profile Picture:</label>
-  <input type="file" id="profilePic" accept="image/*">
-  <label>Interests:</label>
-  <div class="checkbox-group">
-    <label><input type="checkbox" value="Music"> Music 🎵</label>
-    <label><input type="checkbox" value="Sports"> Sports 🏀</label>
-    <label><input type="checkbox" value="Coding"> Coding 💻</label>
-    <label><input type="checkbox" value="Movies"> Movies 🎬</label>
-    <label><input type="checkbox" value="Travelling"> Travelling ✈️</label>
-    <label><input type="checkbox" value="Reading"> Reading 📚</label>
-  </div>
-  <input type="text" id="profileInstagram" placeholder="Instagram handle">
-  <input type="email" id="profileEmail" placeholder="University Email">
-  <button onclick="saveProfile()">💖 Save Profile</button>
+<h2 style="text-align:center">Profile Setup</h2>
+<textarea id="bio" placeholder="Short bio"></textarea>
+<label>Take Photo:</label>
+<video id="camera" width="100%" autoplay style="border-radius: 15px; margin-bottom: 10px; display:none;"></video>
+<canvas id="canvas" style="display:none"></canvas>
+<button onclick="startCamera()">Open Camera</button>
+<button onclick="takePhoto()">Take Photo</button>
+<label style="text-align:center; display:block; margin-top:10px;">OR Upload Image (Max 2MB)</label>
+<input type="file" id="upload" onchange="checkFileSize()">
+<img id="preview" class="preview" alt="Image Preview" style="display:none; width:100%; border-radius:15px; margin-top:10px;">
+
+<label style="text-align:center; display:block; margin-top:10px;">Interests:</label>
+<div class="interests-grid">
+  <label><input type="checkbox" value="Music"> Music</label>
+  <label><input type="checkbox" value="Sports"> Sports</label>
+  <label><input type="checkbox" value="Coding"> Coding</label>
+  <label><input type="checkbox" value="Movies"> Movies</label>
+  <label><input type="checkbox" value="Art"> Art</label>
+  <label><input type="checkbox" value="Travel"> Travel</label>
+  <label><input type="checkbox" value="Photography"> Photography</label>
+  <label><input type="checkbox" value="Gaming"> Gaming</label>
+  <label><input type="checkbox" value="Food"> Food</label>
+  <label><input type="checkbox" value="Fitness"> Fitness</label>
+  <label><input type="checkbox" value="Reading"> Reading</label>
+  <label><input type="checkbox" value="Dancing"> Dancing</label>
+</div>
+<input id="insta" placeholder="Instagram">
+<button onclick="saveProfile()">Save Profile</button>
 </div>
 
-<!-- Dashboard -->
+<!-- DASHBOARD -->
 <div id="dashboardPage" class="container">
-  <h2>Welcome, <span id="dashboardName"></span></h2>
-  <p>Student ID: <span id="dashboardID"></span></p>
-  <button onclick="showPage('profilePage')">✏️ Edit Profile</button>
-  <button onclick="showPage('matchPage')">❤️ Find Matches</button>
-  <button onclick="logout()">🚪 Logout</button>
+<h2 style="text-align:center">Welcome <span id="userName"></span></h2>
+<button onclick="startSwipe()">Discover People</button>
+<button onclick="showMatches()">Find Matches</button>
+<button onclick="showPage('profilePage')">Edit Profile</button>
+<button onclick="logout()">Logout</button>
 </div>
 
-<!-- Matches Page -->
+<!-- SWIPE -->
+<div id="swipePage" class="container">
+<h2 style="text-align:center">Discover People</h2>
+<div id="swipeCard"></div>
+<button onclick="likeUser()">❤️ Like</button>
+<button onclick="passUser()">❌ Pass</button>
+<button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- MATCHES -->
 <div id="matchPage" class="container">
-  <h2>Your Matches</h2>
-  <div id="matchesContainer"></div>
-  <button onclick="showPage('dashboardPage')">⬅️ Back to Dashboard</button>
+<h2 style="text-align:center">Matches</h2>
+<div id="matchList"></div>
+<button onclick="showPage('dashboardPage')">Back</button>
 </div>
 
-<script>
-let users=[]; let currentUser=null;
-let interestEmoji={"Music":"🎵","Sports":"🏀","Coding":"💻","Movies":"🎬","Travelling":"✈️","Reading":"📚"};
+<!-- CHAT -->
+<div id="chatPage" class="container">
+<div class="chat-header">
+  <h2 id="chatPartnerName" style="text-align:center; margin: 0; flex-grow: 1;">Chat</h2>
+  <div id="callButtons"></div>
+</div>
+<div id="chatBox" style="height:200px;overflow:auto;border:1px solid #ccc;padding:10px"></div>
+<div id="typingIndicator" style="display: none;"></div>
+<input id="chatInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+<button onclick="showPage('matchPage')">Back</button>
+</div>
 
-function showPage(pageId){
-  document.querySelectorAll('.container').forEach(c=>c.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-}
+<!-- CALL OVERLAY -->
+<div id="callOverlay">
+    <div class="call-container">
+        <img id="callPartnerAvatar" src="" alt="Avatar">
+        <h3 id="callStatus">Calling...</h3>
+        <p id="callPartnerNameOverlay"></p>
+        <button id="hangUpButton" onclick="hangUp()">Hang Up</button>
+    </div>
+</div>
 
-function signup(){
-  const user={
-    name:document.getElementById('signupName').value,
-    age:document.getElementById('signupAge').value,
-    gender:document.getElementById('signupGender').value,
-    preferred_gender:document.getElementById('signupPrefGender').value,
-    faculty:document.getElementById('signupFaculty').value,
-    year:document.getElementById('signupYear').value,
-    studentID:document.getElementById('signupStudentID').value,
-    password:document.getElementById('signupPassword').value,
-    bio:"",interests:[],instagram:"",profilePic:""
-  };
-  users.push(user);
-  alert("Signup successful!");
-  showPage('loginPage');
-}
-
-function login(){
-  const studentID=document.getElementById('loginStudentID').value;
-  const password=document.getElementById('loginPassword').value;
-  const user=users.find(u=>u.studentID===studentID && u.password===password);
-  if(user){ currentUser=user;
-    document.getElementById('dashboardName').innerText=user.name;
-    document.getElementById('dashboardID').innerText=user.studentID;
-    showPage('dashboardPage');
-  } else { alert("Invalid Student ID or password!"); }
-}
-
-function saveProfile(){
-  currentUser.bio=document.getElementById('profileBio').value;
-  currentUser.instagram=document.getElementById('profileInstagram').value;
-  currentUser.email=document.getElementById('profileEmail').value;
-  const checkboxes=document.querySelectorAll('#profilePage .checkbox-group input[type="checkbox"]');
-  currentUser.interests=[]; checkboxes.forEach(c=>{if(c.checked)currentUser.interests.push(c.value);});
-  alert("Profile saved!"); showPage('dashboardPage');
-}
-
-function logout(){ currentUser=null; showPage('loginPage'); }
-
-function showMatches(){
-  const container=document.getElementById('matchesContainer'); container.innerHTML="";
-  users.forEach(u=>{
-    if(u===currentUser)return;
-    let score=0;
-    if(currentUser.preferred_gender==="Any"||currentUser.preferred_gender===u.gender)score+=40;
-    u.interests.forEach(i=>{if(currentUser.interests.includes(i))score+=10;});
-    if(currentUser.faculty===u.faculty)score+=10;
-    const shared=u.interests.filter(i=>currentUser.interests.includes(i)).map(i=>interestEmoji[i]+" "+i).join(', ');
-    const card=document.createElement('div'); card.className="card";
-    card.innerHTML=`<h3>${u.name}</h3>
-      <p>Student ID: ${u.studentID}</p>
-      <p>Faculty: ${u.faculty}</p>
-      <p>Match: ${score}%</p>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${score}%"></div></div>
-      <p>Shared Interests: ${shared||"None"}</p>
-      <p>Instagram: ${u.instagram||"N/A"}</p>
-      <button onclick="alert('Contact info revealed!')">💌 Reveal Contact Info</button>`;
-    container.appendChild(card);
-  });
-}
-
-document.querySelector('#dashboardPage button[onclick="showPage(\'matchPage\')"]').addEventListener('click', showMatches);
-
-/* Dark/Light Mode Toggle */
-const modeToggle=document.getElementById('modeToggle');
-modeToggle.addEventListener('click', ()=>{
-  document.body.classList.toggle('dark');
-  modeToggle.innerText = document.body.classList.contains('dark') ? '☀️' : '🌙';
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
