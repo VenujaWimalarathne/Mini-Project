@@ -23,9 +23,10 @@
 <!-- LOGIN -->
 <div id="loginPage" class="container active">
 <h2>Login</h2>
-<input id="loginID" placeholder="User Id">
+<input id="loginIdentifier" type="text" placeholder="Email or University ID">
 <input id="loginPass" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
+<p style="font-size: 14px; text-align: right; margin-top: 5px;"><a onclick="forgotPassword()" style="cursor:pointer">Forgot Password?</a></p>
 <p>No account? <a onclick="showPage('signupPage')" style="cursor:pointer">Signup</a></p>
 </div>
 
@@ -33,6 +34,7 @@
 <div id="signupPage" class="container">
 <h2 style="text-align:center">Signup</h2>
 <input id="name" placeholder="Full Name">
+<input id="email" type="email" placeholder="Email Address">
 <input id="age" placeholder="Age">
 <select id="gender"><option>Male</option><option>Female</option></select>
 <select id="pref"><option>Male</option><option>Female</option><option>Any</option></select>
@@ -41,6 +43,14 @@
 <input id="studentID" placeholder="Student ID">
 <input id="password" type="password" placeholder="Password">
 <button onclick="signup()">Signup</button>
+</div>
+
+<!-- VERIFICATION -->
+<div id="verificationPage" class="container">
+<h2 style="text-align:center">Verify Your Email</h2>
+<p>A verification code has been sent to your email. For this demo, the code is <strong>123456</strong>.</p>
+<input id="verificationCode" placeholder="Enter verification code">
+<button onclick="verifyCode()">Verify</button>
 </div>
 
 <!-- PROFILE -->
@@ -81,7 +91,24 @@
 <button onclick="startSwipe()">Discover People</button>
 <button onclick="showMatches()">Find Matches</button>
 <button onclick="showPage('profilePage')">Edit Profile</button>
+<button onclick="showSettingsPage()">Account Settings</button>
 <button onclick="logout()">Logout</button>
+</div>
+
+<!-- SETTINGS -->
+<div id="settingsPage" class="container">
+<h2 style="text-align:center">Account Settings</h2>
+<label>Current Password (required for changes)</label>
+<input id="currentPass" type="password" placeholder="Enter current password">
+<hr style="border: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+<label>New Email</label>
+<input id="newEmail" type="email" placeholder="Enter new email address">
+<label>New Password</label>
+<input id="newPass" type="password" placeholder="Enter new password">
+<input id="confirmNewPass" type="password" placeholder="Confirm new password">
+<button onclick="saveSettings()">Save Changes</button>
+<button id="deleteAccountBtn" onclick="deleteAccount()">Delete Account</button>
+<button onclick="showPage('dashboardPage')">Back</button>
 </div>
 
 <!-- SWIPE -->
@@ -96,6 +123,7 @@
 <!-- MATCHES -->
 <div id="matchPage" class="container">
 <h2 style="text-align:center">Matches</h2>
+<input type="search" id="matchSearchInput" onkeyup="filterMatches()" placeholder="Search matches by name...">
 <div id="matchList"></div>
 <button onclick="showPage('dashboardPage')">Back</button>
 </div>

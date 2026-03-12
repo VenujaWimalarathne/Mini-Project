@@ -70,6 +70,8 @@ body.dark .container{
 #swipePage{background: linear-gradient(135deg,#cfd9df,#e2ebf0,#ff9a9e);}
 #matchPage{background: linear-gradient(135deg,#fbc2eb,#a6c1ee,#84fab0);}
 #chatPage{background: linear-gradient(135deg,#ffb347,#ffcc33,#f9f586);}
+#verificationPage{background: linear-gradient(135deg,#f6d365,#fda085);}
+#settingsPage{background: linear-gradient(135deg,#89f7fe,#66a6ff);}
 
 body.dark #loginPage{background: linear-gradient(135deg,#2c3e50,#4ca1af);}
 body.dark #signupPage{background: linear-gradient(135deg,#141e30,#243b55);}
@@ -78,6 +80,8 @@ body.dark #dashboardPage{background: linear-gradient(135deg,#16222a,#3a6073);}
 body.dark #swipePage{background: linear-gradient(135deg,#203a43,#2c5364);}
 body.dark #matchPage{background: linear-gradient(135deg,#3c1053,#ad5389);}
 body.dark #chatPage{background: linear-gradient(135deg,#28313b,#485461);}
+body.dark #verificationPage{background: linear-gradient(135deg,#525252,#3d72b4);}
+body.dark #settingsPage{background: linear-gradient(135deg,#434343,#000000);}
 
 /* Inputs */
 input, select, textarea{
@@ -101,6 +105,36 @@ button{
 }
 button:hover{transform:scale(1.05); box-shadow:0 12px 25px rgba(255,77,136,0.6);}
 
+#deleteAccountBtn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Notification Badge */
+.notification-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 12px;
+}
+.notification-wrapper button {
+    margin-top: 0;
+}
+#matchNotificationBadge {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
 /* Last Seen Text */
 .last-seen {
     font-size: 12px;
@@ -113,6 +147,7 @@ body.dark .last-seen { color: #ccc; }
 
 /* Cards */
 .card{
+  position: relative;
   background: rgba(255,255,255,0.3); backdrop-filter: blur(10px);
   border-radius:20px; padding:15px; margin:12px 0;
   box-shadow:0 8px 20px rgba(0,0,0,0.2);
@@ -120,6 +155,48 @@ body.dark .last-seen { color: #ccc; }
 }
 body.dark .card{background: rgba(50,50,50,0.5);}
 .card img{width:100%; border-radius:15px; margin-top:10px;}
+
+.swipe-card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding-top: 15px;
+}
+
+body.dark .swipe-card-actions {
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.swipe-card-actions button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    margin-top: 0;
+    padding: 0;
+    line-height: 50px;
+    flex-shrink: 0;
+}
+
+.chat-notification-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid white;
+}
+body.dark .chat-notification-badge { border-color: #333; }
 
 /* Match bar */
 .bar{background: rgba(255,255,255,0.3); height:18px; border-radius:12px; overflow:hidden; margin-top:6px;}
@@ -216,6 +293,9 @@ body.dark #typingIndicator {
     line-height: 40px;
     flex-shrink: 0;
 }
+#callButtons .block-btn {
+    background: #e74c3c;
+}
 
 /* New Chat Message Structure */
 .message-container {
@@ -269,3 +349,18 @@ body.dark .message-time { color: #aaa; }
 .call-container h3 { font-size: 24px; }
 .call-container p { font-size: 18px; margin-bottom: 30px; }
 #hangUpButton { background: #e74c3c; box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4); width: auto; padding: 12px 30px; }
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .watermark {
+        font-size: 50px;
+    }
+    .container {
+        padding: 20px;
+        width: 95%;
+    }
+    .interests-grid {
+        grid-template-columns: 1fr;
+    }
+    h2 { font-size: 1.4em; }
+}
