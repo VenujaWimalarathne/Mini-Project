@@ -170,6 +170,59 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- UI ENHANCEMENTS (Password Strength) ---
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
+
+    function checkPasswordStrength(password) {
+        let score = 0;
+        if (!password) return 0;
+        if (password.length > 7) score++; // Length > 7
+        if (/[A-Z]/.test(password)) score++; // Has uppercase
+        if (/[0-9]/.test(password)) score++; // Has numbers
+        if (/[^A-Za-z0-9]/.test(password)) score++; // Has special character
+        return score;
+    }
+
+    function updateStrengthIndicator(strength) {
+        const strengthLevels = {
+            0: { text: '', width: '0%', color: '#ddd' },
+            1: { text: 'Weak', width: '25%', color: '#e74c3c' },
+            2: { text: 'Medium', width: '50%', color: '#f39c12' },
+            3: { text: 'Strong', width: '75%', color: '#f1c40f' },
+            4: { text: 'Very Strong', width: '100%', color: '#2ecc71' }
+        };
+        const level = strengthLevels[strength] || strengthLevels[0];
+        
+        if (strengthBar) {
+            strengthBar.style.width = level.width;
+            strengthBar.style.backgroundColor = level.color;
+        }
+        if (strengthText) {
+            strengthText.textContent = level.text;
+        }
+    }
+
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const strength = checkPasswordStrength(password);
+            updateStrengthIndicator(strength);
+        });
+    }
+
+    window.togglePassword = (icon) => {
+        const input = icon.previousElementSibling;
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "🙈"; // Icon for 'Hide'
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️"; // Icon for 'Show'
+        }
+    }
+
     // --- AUTHENTICATION ---
     window.login = () => {
         const identifier = document.getElementById('loginIdentifier').value.trim();
@@ -211,14 +264,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const userIdToDelete = currentUser.id;
+
         // Filter out the current user
-        users = users.filter(user => user.id !== currentUser.id);
+        users = users.filter(user => user.id !== userIdToDelete);
+
+        // Clean up references in other users (likes, passes, matches, etc.)
+        users.forEach(user => {
+            if (user.likes) user.likes = user.likes.filter(id => id !== userIdToDelete);
+            if (user.passes) user.passes = user.passes.filter(id => id !== userIdToDelete);
+            if (user.blocked) user.blocked = user.blocked.filter(id => id !== userIdToDelete);
+            if (user.newMatches) user.newMatches = user.newMatches.filter(id => id !== userIdToDelete);
+            if (user.unreadMessages) delete user.unreadMessages[userIdToDelete];
+        });
+
         DB.saveUsers(users);
 
         // Also remove any chats involving this user
         const allChats = DB.getChats();
         for (const chatId in allChats) {
-            if (chatId.includes(currentUser.id)) {
+            const participants = chatId.split('_');
+            if (participants.includes(userIdToDelete)) {
                 delete allChats[chatId];
             }
         }
@@ -314,8 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const year = document.getElementById('year').value;
         const studentID = document.getElementById('studentID').value.trim();
         const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-        if (!name || !email || !age || !faculty || !year || !studentID || !password) {
+        if (!name || !email || !age || !faculty || !year || !studentID || !password || !confirmPassword) {
             alert('Please fill all fields.');
             return;
         }
@@ -328,6 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (users.some(u => u.id === studentID)) {
             alert('Student ID already exists.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match.');
             return;
         }
 
@@ -347,22 +419,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.verifyCode = () => {
-        const code = document.getElementById('verificationCode').value.trim();
-        if (code === '123456') { // Demo verification code
-            if (pendingUser) {
-                users.push(pendingUser);
-                DB.saveUsers(users);
-                
-                // Log in the new user and go to profile setup
-                currentUser = pendingUser;
-                DB.setCurrentUserId(currentUser.id);
-                alert('Signup successful! Please set up your profile.');
-                showPage('profilePage');
-                pendingUser = null; // Clear pending user
-            }
+        // This function is now simplified for the "Simulate Email Verification" button
+        if (pendingUser) {
+            users.push(pendingUser);
+            DB.saveUsers(users);
+            
+            // Log in the new user and go to profile setup
+            currentUser = pendingUser;
+            DB.setCurrentUserId(currentUser.id);
+            alert('Signup successful! Please set up your profile.');
+            showPage('profilePage');
+            pendingUser = null; // Clear pending user
         } else {
-            alert('Invalid verification code.');
+            // This might happen if the user refreshes the verification page
+            alert('Registration session expired. Please sign up again.');
+            showPage('signupPage');
         }
+    }
+
+    window.resendVerification = () => {
+        const resendBtn = document.getElementById('resendVerificationBtn');
+        if (!resendBtn) return;
+
+        let cooldown = 30; // 30 seconds cooldown
+        resendBtn.disabled = true;
+        alert("A new verification link has been sent (simulation).");
+
+        const interval = setInterval(() => {
+            cooldown--;
+            resendBtn.textContent = `Resend in ${cooldown}s`;
+            if (cooldown <= 0) {
+                clearInterval(interval);
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Resend Link';
+            }
+        }, 1000);
     }
 
     // --- PROFILE SETUP ---

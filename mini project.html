@@ -6,11 +6,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Campus Match</title>
 <link rel="stylesheet" href="style.css">
+<style>
+/* Romantic Floating Animation */
+.floating-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: -1; overflow: hidden;
+}
+.floating-icon {
+    position: absolute; bottom: -50px;
+    animation: floatUp 15s linear infinite;
+    opacity: 0; font-size: 24px;
+}
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.7; }
+    80% { opacity: 0.7; }
+    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+.floating-icon:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; font-size: 28px; }
+.floating-icon:nth-child(2) { left: 25%; animation-duration: 18s; animation-delay: 4s; font-size: 22px; }
+.floating-icon:nth-child(3) { left: 40%; animation-duration: 14s; animation-delay: 2s; font-size: 30px; }
+.floating-icon:nth-child(4) { left: 60%; animation-duration: 20s; animation-delay: 6s; font-size: 26px; }
+.floating-icon:nth-child(5) { left: 75%; animation-duration: 16s; animation-delay: 1s; font-size: 24px; }
+.floating-icon:nth-child(6) { left: 90%; animation-duration: 22s; animation-delay: 5s; font-size: 32px; }
+
+/* Footer Watermark */
+.watermark-footer {
+    position: fixed; bottom: 10px; right: 20px;
+    font-family: sans-serif; font-size: 12px;
+    color: rgba(255, 105, 180, 0.5); /* Soft Pink */
+    pointer-events: none; z-index: 9999;
+}
+.demo-note {
+    font-size: 14px; color: #555; text-align: center; margin-top: 5px;
+}
+body.dark .demo-note { color: #bbb; }
+</style>
 </head>
 <body>
 
 <!-- Animated Watermark -->
 <div class="watermark">Campus Match</div>
+
+<!-- Romantic Floating Icons -->
+<div class="floating-container">
+    <div class="floating-icon">❤️</div>
+    <div class="floating-icon">🌹</div>
+    <div class="floating-icon">💌</div>
+    <div class="floating-icon">💕</div>
+    <div class="floating-icon">💖</div>
+    <div class="floating-icon">💍</div>
+</div>
+
+<!-- Fixed Footer Watermark -->
+<div class="watermark-footer">Campus Match © 2024</div>
 
 <!-- Dark/Light Toggle -->
 <button id="modeToggle">🌙 Dark</button>
@@ -24,7 +73,10 @@
 <div id="loginPage" class="container active">
 <h2>Login</h2>
 <input id="loginIdentifier" type="text" placeholder="Email or University ID">
-<input id="loginPass" type="password" placeholder="Password">
+<div class="password-wrapper">
+    <input id="loginPass" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
 <button onclick="login()">Login</button>
 <p style="font-size: 14px; text-align: right; margin-top: 5px;"><a onclick="forgotPassword()" style="cursor:pointer">Forgot Password?</a></p>
 <p>No account? <a onclick="showPage('signupPage')" style="cursor:pointer">Signup</a></p>
@@ -41,16 +93,30 @@
 <input id="faculty" placeholder="Faculty (e.g. Computer Science)">
 <input id="year" placeholder="Year">
 <input id="studentID" placeholder="Student ID">
-<input id="password" type="password" placeholder="Password">
+<div class="password-wrapper">
+    <input id="password" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div id="passwordStrengthIndicator">
+    <div id="strength-bar"></div>
+    <span id="strength-text"></span>
+</div>
+<div class="password-wrapper">
+    <input id="confirmPassword" type="password" placeholder="Confirm Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
 <button onclick="signup()">Signup</button>
+<p>Already have an account? <a onclick="showPage('loginPage')" style="cursor:pointer">Login</a></p>
 </div>
 
 <!-- VERIFICATION -->
 <div id="verificationPage" class="container">
-<h2 style="text-align:center">Verify Your Email</h2>
-<p>A verification code has been sent to your email. For this demo, the code is <strong>123456</strong>.</p>
-<input id="verificationCode" placeholder="Enter verification code">
-<button onclick="verifyCode()">Verify</button>
+    <h2 style="text-align:center">Verify Your Email</h2>
+    <p>A verification link has been sent to <strong id="verificationEmail">your email address</strong>. Please check your inbox and click the link to complete your registration.</p>
+    <p class="demo-note">(Since this is a demo without a backend server, no email is actually sent. You can proceed by clicking the button below.)</p>
+    <button onclick="verifyCode()">Simulate Email Verification</button>
+    <button id="resendVerificationBtn" onclick="resendVerification()">Resend Link</button>
+    <p style="margin-top: 10px; text-align: center;"><a onclick="showPage('loginPage')" style="cursor:pointer">Back to Login</a></p>
 </div>
 
 <!-- PROFILE -->
@@ -104,8 +170,18 @@
 <label>New Email</label>
 <input id="newEmail" type="email" placeholder="Enter new email address">
 <label>New Password</label>
-<input id="newPass" type="password" placeholder="Enter new password">
-<input id="confirmNewPass" type="password" placeholder="Confirm new password">
+<div class="password-wrapper">
+    <input id="currentPass" type="password" placeholder="Enter current password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div class="password-wrapper">
+    <input id="newPass" type="password" placeholder="Enter new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div class="password-wrapper">
+    <input id="confirmNewPass" type="password" placeholder="Confirm new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
 <button onclick="saveSettings()">Save Changes</button>
 <button id="deleteAccountBtn" onclick="deleteAccount()">Delete Account</button>
 <button onclick="showPage('dashboardPage')">Back</button>
