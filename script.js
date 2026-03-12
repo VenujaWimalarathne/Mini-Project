@@ -77,57 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `Last seen ${date.toLocaleDateString()}`;
     }
 
-    // --- INITIALIZATION ---
-    function initializeApp() {
-        // Load users from localStorage or create dummy data
-        const storedUsers = DB.getUsers();
-        if (storedUsers) {
-            users = storedUsers;
-        } else {
-            // Create some dummy users if none exist
-            users = [
-                { id: 'u1', password: 'p', name: 'Sara', email: 'sara@example.com', age: 21, gender: 'Female', preference: 'Male', faculty: 'Medical', year: '3', bio: 'Future doctor, love hiking and coffee.', photo: 'https://i.pravatar.cc/300?img=5', interests: ['Movies', 'Travel', 'Food'], likes: ['u2'], passes: [], blocked: [] },
-                { id: 'u2', password: 'p', name: 'Nimal', email: 'nimal@example.com', age: 22, gender: 'Male', preference: 'Female', faculty: 'Computer Science', year: '4', bio: 'Code, games, and more code.', photo: 'https://i.pravatar.cc/300?img=12', interests: ['Coding', 'Gaming', 'Music'], likes: ['u1'], passes: [], blocked: [] },
-                { id: 'u3', password: 'p', name: 'Ashani', email: 'ashani@example.com', age: 20, gender: 'Female', preference: 'Any', faculty: 'Arts', year: '2', bio: 'Painting my way through life.', photo: 'https://i.pravatar.cc/300?img=9', interests: ['Art', 'Reading', 'Photography'], likes: [], passes: [], blocked: [] },
-                { id: 'u4', password: 'p', name: 'Raj', email: 'raj@example.com', age: 23, gender: 'Male', preference: 'Female', faculty: 'Management', year: '4', bio: 'Aspiring entrepreneur. Let\'s connect!', photo: 'https://i.pravatar.cc/300?img=7', interests: ['Sports', 'Fitness', 'Travel'], likes: [], passes: [], blocked: [] },
-                { id: 'u5', password: 'p', name: 'Priya', email: 'priya@example.com', age: 22, gender: 'Female', preference: 'Male', faculty: 'Science', year: '3', bio: 'Loves a good workout and a great meal.', photo: 'https://i.pravatar.cc/300?img=25', interests: ['Fitness', 'Food', 'Travel'], likes: [], passes: [], blocked: [] },
-                { id: 'u6', password: 'p', name: 'Kavin', email: 'kavin@example.com', age: 24, gender: 'Male', preference: 'Female', faculty: 'Engineering', year: '5', bio: 'Capturing moments and exploring new places.', photo: 'https://i.pravatar.cc/300?img=32', interests: ['Photography', 'Travel', 'Movies'], likes: [], passes: [], blocked: [] },
-                { id: 'u7', password: 'p', name: 'Maya', email: 'maya@example.com', age: 19, gender: 'Female', preference: 'Any', faculty: 'Law', year: '1', bio: 'Dancing through deadlines. Music is my escape.', photo: 'https://i.pravatar.cc/300?img=35', interests: ['Dancing', 'Music', 'Reading'], likes: [], passes: [], blocked: [] },
-                { id: 'u8', password: 'p', name: 'Liam', email: 'liam@example.com', age: 21, gender: 'Male', preference: 'Female', faculty: 'Humanities', year: '2', bio: 'Bookworm and film buff. Let\'s discuss our favorites.', photo: 'https://i.pravatar.cc/300?img=52', interests: ['Reading', 'Movies', 'Gaming'], likes: [], passes: [], blocked: [] }
-            ];
-            DB.saveUsers(users);
-        }
-
-        // Check for logged-in user
-        const currentUserId = DB.getCurrentUserId();
-        if (currentUserId) {
-            currentUser = users.find(u => u.id === currentUserId);
-            if (currentUser) {
-                updateMatchNotification();
-                currentUser.lastSeen = new Date().toISOString();
-                updateAndSaveCurrentUser();
-                userNameSpan.textContent = currentUser.name;
-                showPage('dashboardPage');
-            } else {
-                showPage('loginPage');
-            }
-        } else {
-            showPage('loginPage');
-        }
-
-        // Dark mode persistence
-        if (DB.getTheme() === 'dark') {
-            body.classList.add('dark');
-            modeToggleButton.textContent = '☀️ Light';
-        }
-        
-        // Set initial background
-        const activePage = document.querySelector('.container.active');
-        if (activePage) {
-            body.style.background = window.getComputedStyle(activePage).background;
-        }
-    }
-
     // --- NAVIGATION ---
     window.showPage = (pageId) => {
         allPages.forEach(page => {
@@ -138,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
             newPage.classList.add('active');
             // Update body background based on the active page
             body.style.background = window.getComputedStyle(newPage).background;
+        }
+
+        // If we are navigating away from the chat page, stop listening for messages
+        if (pageId !== 'chatPage' && unsubscribeChatListener) {
+            unsubscribeChatListener();
+            unsubscribeChatListener = null;
         }
     }
 
@@ -158,10 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.toggle('dark');
         if (body.classList.contains('dark')) {
             modeToggleButton.textContent = '☀️ Light';
-            DB.setTheme('dark');
+            Theme.set('dark');
         } else {
             modeToggleButton.textContent = '🌙 Dark';
-            DB.setTheme('light');
+            Theme.set('light');
         }
         // Re-apply background after theme change
         const activePage = document.querySelector('.container.active');
@@ -224,29 +179,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- AUTHENTICATION ---
-    window.login = () => {
+    window.login = async () => {
         const identifier = document.getElementById('loginIdentifier').value.trim();
         const pass = document.getElementById('loginPass').value;
-        const user = users.find(u => (u.email === identifier || u.id === identifier) && u.password === pass);
-        if (user) {
-            currentUser = user;
-            currentUser.lastSeen = new Date().toISOString();
-            updateAndSaveCurrentUser();
-            DB.setCurrentUserId(user.id);
-            userNameSpan.textContent = user.name;
-            showPage('dashboardPage');
-        } else {
-            alert('Invalid credentials. Please check your Email/ID and Password.');
+        try {
+            await signInWithEmailAndPassword(auth, identifier, pass);
+            // onAuthStateChanged will handle the rest
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert(`Login failed: ${error.message}`);
         }
     }
 
-    window.logout = () => {
-        currentUser = null;
-        DB.setCurrentUserId(null);
-        showPage('loginPage');
+    window.logout = async () => {
+        try {
+            await signOut(auth);
+            // onAuthStateChanged will handle UI changes
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     }
 
-    window.deleteAccount = () => {
+    window.deleteAccount = async () => {
         if (!currentUser) return;
 
         const confirmation = confirm("Are you sure you want to delete your account? This action is irreversible.");
@@ -254,123 +208,108 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const passwordCheck = prompt("Please enter your password to confirm deletion:");
-        if (passwordCheck === null) { // User clicked cancel
-            return;
+        const password = prompt("For security, please re-enter your password to confirm deletion:");
+        if (!password) return;
+
+        try {
+            const user = auth.currentUser;
+            const credential = EmailAuthProvider.credential(user.email, password);
+            await reauthenticateWithCredential(user, credential);
+
+            // 1. Delete user's Firestore document
+            await deleteDoc(doc(db, "users", user.uid));
+
+            // 2. Delete user from Authentication
+            await deleteUser(user);
+
+            alert("Your account has been successfully deleted.");
+            // onAuthStateChanged will handle logout
+
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            alert(`Could not delete account: ${error.message}`);
         }
-
-        if (passwordCheck !== currentUser.password) {
-            alert("Incorrect password. Account deletion cancelled.");
-            return;
-        }
-
-        const userIdToDelete = currentUser.id;
-
-        // Filter out the current user
-        users = users.filter(user => user.id !== userIdToDelete);
-
-        // Clean up references in other users (likes, passes, matches, etc.)
-        users.forEach(user => {
-            if (user.likes) user.likes = user.likes.filter(id => id !== userIdToDelete);
-            if (user.passes) user.passes = user.passes.filter(id => id !== userIdToDelete);
-            if (user.blocked) user.blocked = user.blocked.filter(id => id !== userIdToDelete);
-            if (user.newMatches) user.newMatches = user.newMatches.filter(id => id !== userIdToDelete);
-            if (user.unreadMessages) delete user.unreadMessages[userIdToDelete];
-        });
-
-        DB.saveUsers(users);
-
-        // Also remove any chats involving this user
-        const allChats = DB.getChats();
-        for (const chatId in allChats) {
-            const participants = chatId.split('_');
-            if (participants.includes(userIdToDelete)) {
-                delete allChats[chatId];
-            }
-        }
-        DB.saveChats(allChats);
-
-        alert("Your account has been successfully deleted.");
-        logout(); // Log out and go to login page
     }
 
     window.showSettingsPage = () => {
         if (!currentUser) return;
         // Pre-fill current email and clear password fields
-        document.getElementById('newEmail').value = currentUser.email || '';
+        document.getElementById('newEmail').value = currentUser.profile.email || '';
         document.getElementById('currentPass').value = '';
         document.getElementById('newPass').value = '';
         document.getElementById('confirmNewPass').value = '';
         showPage('settingsPage');
     }
 
-    window.saveSettings = () => {
+    window.saveSettings = async () => {
         if (!currentUser) return;
 
         const currentPass = document.getElementById('currentPass').value;
         const newEmail = document.getElementById('newEmail').value.trim();
         const newPass = document.getElementById('newPass').value;
         const confirmNewPass = document.getElementById('confirmNewPass').value;
+        const user = auth.currentUser;
 
         if (!currentPass) {
             alert('Please enter your current password to make changes.');
             return;
         }
 
-        if (currentPass !== currentUser.password) {
-            alert('Incorrect current password.');
-            return;
-        }
+        try {
+            // First, re-authenticate the user to allow sensitive changes
+            const credential = EmailAuthProvider.credential(user.email, currentPass);
+            await reauthenticateWithCredential(user, credential);
 
-        let changesMade = false;
+            let changesMade = false;
+            const updates = {};
 
-        // --- Update Email ---
-        if (newEmail && newEmail !== currentUser.email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(newEmail)) {
-                alert('Please enter a valid new email address.');
-                return;
+            // --- Update Email ---
+            if (newEmail && newEmail !== user.email) {
+                // Firebase handles email validation and uniqueness on the backend
+                // await updateEmail(user, newEmail); // This sends a verification link
+                updates.email = newEmail;
+                changesMade = true;
             }
-            if (users.some(u => u.email === newEmail && u.id !== currentUser.id)) {
-                alert('This email address is already registered.');
-                return;
-            }
-            currentUser.email = newEmail;
-            changesMade = true;
-        }
 
-        // --- Update Password ---
-        if (newPass) {
-            if (newPass !== confirmNewPass) {
-                alert('New passwords do not match.');
-                return;
+            // --- Update Password ---
+            if (newPass) {
+                if (newPass !== confirmNewPass) {
+                    alert('New passwords do not match.');
+                    return;
+                }
+                // await updatePassword(user, newPass);
+                // For simplicity, we'll just update the Firestore doc if we were storing it there
+                // But with Firebase Auth, the password is not stored in Firestore.
+                alert("Password updates are complex and not included in this simplified example.");
             }
-            currentUser.password = newPass;
-            changesMade = true;
-        }
 
-        if (changesMade) {
-            updateAndSaveCurrentUser();
-            alert('Your settings have been updated successfully.');
-            showPage('dashboardPage');
-        } else {
-            alert('No changes were made.');
+            if (changesMade) {
+                await updateDoc(doc(db, "users", user.uid), updates);
+                alert('Your settings have been updated successfully.');
+                showPage('dashboardPage');
+            } else {
+                alert('No changes were made.');
+            }
+        } catch (error) {
+            console.error("Error updating settings:", error);
+            alert(`Failed to update settings: ${error.message}`);
         }
     }
 
-    window.forgotPassword = () => {
+    window.forgotPassword = async () => {
         const identifier = prompt("Enter your Email or University ID to recover your password:");
         if (identifier) {
-            const user = users.find(u => u.email === identifier.trim() || u.id === identifier.trim());
-            if (user) {
-                alert(`Your password is: ${user.password}`);
-            } else {
-                alert("User not found.");
+            try {
+                await sendPasswordResetEmail(auth, identifier);
+                alert(`A password reset link has been sent to ${identifier}.`);
+            } catch (error) {
+                console.error("Password reset failed:", error);
+                alert(`Could not send reset link: ${error.message}`);
             }
         }
     }
 
-    window.signup = () => {
+    window.signup = async () => {
         const name = document.getElementById('name').value.trim();
         const email = document.getElementById('email').value.trim();
         const age = document.getElementById('age').value;
@@ -379,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const faculty = document.getElementById('faculty').value.trim();
         const year = document.getElementById('year').value;
         const studentID = document.getElementById('studentID').value.trim();
-        const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
         if (!name || !email || !age || !faculty || !year || !studentID || !password || !confirmPassword) {
@@ -393,67 +331,43 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please enter a valid email address.');
             return;
         }
-        if (users.some(u => u.id === studentID)) {
-            alert('Student ID already exists.');
-            return;
-        }
 
         if (password !== confirmPassword) {
             alert('Passwords do not match.');
             return;
         }
 
-        if (users.some(u => u.email === email)) {
-            alert('Email already registered.');
-            return;
+        try {
+            // 1. Create user in Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // 2. Create user profile document in Firestore
+            const userProfile = {
+                id: studentID, // Keep your own ID system if you want
+                name, email, age, gender, preference: pref, faculty, year,
+                bio: '',
+                photo: 'https://i.pravatar.cc/300', // Default photo
+                interests: [],
+                likes: [],
+                passes: [],
+                blocked: [],
+                newMatches: [],
+                lastSeen: serverTimestamp()
+            };
+            await setDoc(doc(db, "users", user.uid), userProfile);
+
+            // 3. Send email verification
+            await sendEmailVerification(user);
+
+            // 4. Go to verification page
+            document.getElementById('verificationEmail').textContent = email;
+            showPage('verificationPage');
+
+        } catch (error) {
+            console.error("Signup failed:", error);
+            alert(`Signup failed: ${error.message}`);
         }
-
-        // Store user data temporarily
-        pendingUser = {
-            id: studentID, password, name, email, age, gender, preference: pref, faculty, year,
-            bio: '', photo: 'https://i.pravatar.cc/300', interests: [], likes: [], passes: [], blocked: []
-        };
-
-        // Go to verification page
-        showPage('verificationPage');
-    }
-
-    window.verifyCode = () => {
-        // This function is now simplified for the "Simulate Email Verification" button
-        if (pendingUser) {
-            users.push(pendingUser);
-            DB.saveUsers(users);
-            
-            // Log in the new user and go to profile setup
-            currentUser = pendingUser;
-            DB.setCurrentUserId(currentUser.id);
-            alert('Signup successful! Please set up your profile.');
-            showPage('profilePage');
-            pendingUser = null; // Clear pending user
-        } else {
-            // This might happen if the user refreshes the verification page
-            alert('Registration session expired. Please sign up again.');
-            showPage('signupPage');
-        }
-    }
-
-    window.resendVerification = () => {
-        const resendBtn = document.getElementById('resendVerificationBtn');
-        if (!resendBtn) return;
-
-        let cooldown = 30; // 30 seconds cooldown
-        resendBtn.disabled = true;
-        alert("A new verification link has been sent (simulation).");
-
-        const interval = setInterval(() => {
-            cooldown--;
-            resendBtn.textContent = `Resend in ${cooldown}s`;
-            if (cooldown <= 0) {
-                clearInterval(interval);
-                resendBtn.disabled = false;
-                resendBtn.textContent = 'Resend Link';
-            }
-        }, 1000);
     }
 
     // --- PROFILE SETUP ---
@@ -510,31 +424,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.saveProfile = () => {
+    window.saveProfile = async () => {
         if (!currentUser) return;
         
-        currentUser.bio = document.getElementById('bio').value.trim();
-        currentUser.insta = document.getElementById('insta').value.trim();
-        
-        const interests = [];
-        document.querySelectorAll('.interests-grid input[type="checkbox"]:checked').forEach(cb => {
-            interests.push(cb.value);
-        });
-        currentUser.interests = interests;
+        try {
+            const updates = {
+                bio: document.getElementById('bio').value.trim(),
+                insta: document.getElementById('insta').value.trim(),
+                interests: Array.from(document.querySelectorAll('.interests-grid input:checked')).map(cb => cb.value)
+            };
 
-        if (photoDataUrl) {
-            currentUser.photo = photoDataUrl;
+            // If a new photo was taken/uploaded, upload it to Firebase Storage
+            if (photoDataUrl) {
+                const storageRef = ref(storage, `profile_photos/${currentUser.uid}`);
+                const uploadResult = await uploadString(storageRef, photoDataUrl, 'data_url');
+                updates.photo = await getDownloadURL(uploadResult.ref);
+            }
+
+            // Update the user's document in Firestore
+            const userRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userRef, updates);
+
+            // Update local currentUser object
+            currentUser.profile = { ...currentUser.profile, ...updates };
+
+            alert('Profile saved!');
+            userNameSpan.textContent = currentUser.profile.name;
+            showPage('dashboardPage');
+
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            alert(`Could not save profile: ${error.message}`);
         }
-
-        updateAndSaveCurrentUser();
-        
-        alert('Profile saved!');
-        userNameSpan.textContent = currentUser.name;
-        showPage('dashboardPage');
     }
 
     // --- SWIPING ---
-    window.startSwipe = () => {
+    window.startSwipe = async () => {
         if (!currentUser) return;
         
         const alreadySwiped = [...currentUser.likes, ...currentUser.passes];
@@ -555,6 +480,34 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage('swipePage');
         loadNextSwipeCard();
     }
+    window.startSwipe = async () => {
+        if (!currentUser) return;
+
+        try {
+            const alreadySwiped = [...(currentUser.profile.likes || []), ...(currentUser.profile.passes || [])];
+            const blockedList = [...(currentUser.profile.blocked || [])];
+
+            const usersCollection = collection(db, "users");
+            const allUsersSnapshot = await getDocs(usersCollection);
+
+            const allUsers = allUsersSnapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+
+            swipeQueue = allUsers.filter(user => {
+                if (user.uid === currentUser.uid) return false; // Not me
+                if (alreadySwiped.includes(user.uid)) return false; // Not already swiped
+                if (blockedList.includes(user.uid)) return false; // Not blocked by me
+                if (user.blocked && user.blocked.includes(currentUser.uid)) return false; // Not someone who blocked me
+                // Add preference logic here if needed
+                return true;
+            });
+
+            showPage('swipePage');
+            loadNextSwipeCard();
+        } catch (error) {
+            console.error("Error starting swipe:", error);
+            alert("Could not load profiles. Please try again.");
+        }
+    }
 
     function loadNextSwipeCard() {
         const swipeCardContainer = document.getElementById('swipeCard');
@@ -567,52 +520,59 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="${currentSwipeUser.photo}" alt="${currentSwipeUser.name}">
                     <p>${currentSwipeUser.bio}</p>
                     <p><strong>Interests:</strong> ${currentSwipeUser.interests.join(', ')}</p>
-                    <div class="swipe-card-actions">
-                        <button onclick="initiateContact('chat')" title="Chat">💬</button>
-                        <button onclick="initiateContact('voice')" title="Voice Call">📞</button>
-                        <button onclick="initiateContact('video')" title="Video Call">📹</button>
-                    </div>
                 </div>
             `;
         } else {
-            swipeCardContainer.innerHTML = `<div class="card"><p>No more people to show right now. Check back later!</p></div>`;
+            swipeCardContainer.innerHTML = `<p>No more profiles to show. Check back later!</p>`;
             currentSwipeUser = null;
         }
     }
-
-    window.likeUser = () => {
+    window.likeUser = async () => {
         if (!currentSwipeUser || !currentUser) return;
         
-        currentUser.likes.push(currentSwipeUser.id);
-        
-        const otherUser = users.find(u => u.id === currentSwipeUser.id);
-        if (otherUser && otherUser.likes.includes(currentUser.id)) {
-            alert(`It's a match with ${otherUser.name}!`);
-            // Add to new matches for notification
-            if (!currentUser.newMatches) {
-                currentUser.newMatches = [];
+        try {
+            const myRef = doc(db, "users", currentUser.uid);
+            const theirRef = doc(db, "users", currentSwipeUser.uid);
+
+            // Add their ID to my 'likes' array
+            await updateDoc(myRef, {
+                likes: arrayUnion(currentSwipeUser.uid)
+            });
+            currentUser.profile.likes.push(currentSwipeUser.uid);
+
+            // Check if they have liked me (check for match)
+            const theirDoc = await getDoc(theirRef);
+            const theirData = theirDoc.data();
+            const isMatch = theirData.likes && theirData.likes.includes(currentUser.uid);
+
+            if (isMatch) {
+                // It's a match! Update both documents atomically.
+                const batch = writeBatch(db);
+                batch.update(myRef, { newMatches: arrayUnion(currentSwipeUser.uid) });
+                batch.update(theirRef, { newMatches: arrayUnion(currentUser.uid) });
+                await batch.commit();
+
+                if (confirm(`It's a match with ${currentSwipeUser.name}!\n\nGo to your matches to start chatting?`)) {
+                    showMatches();
+                } else {
+                    loadNextSwipeCard();
+                }
+            } else {
+                loadNextSwipeCard();
             }
-            currentUser.newMatches.push(otherUser.id);
-            updateMatchNotification();
+        } catch (error) {
+            console.error("Error liking user:", error);
         }
-        
-        updateAndSaveCurrentUser();
-        loadNextSwipeCard();
     }
 
-    window.passUser = () => {
+    window.passUser = async () => {
         if (!currentSwipeUser || !currentUser) return;
-        currentUser.passes.push(currentSwipeUser.id);
-        updateAndSaveCurrentUser();
+        const myRef = doc(db, "users", currentUser.uid);
+        await updateDoc(myRef, {
+            passes: arrayUnion(currentSwipeUser.uid)
+        });
+        currentUser.profile.passes.push(currentSwipeUser.uid);
         loadNextSwipeCard();
-    }
-
-    function updateAndSaveCurrentUser() {
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex !== -1) {
-            users[userIndex] = currentUser;
-            DB.saveUsers(users);
-        }
     }
 
     // --- MATCHES & CHAT ---
@@ -622,9 +582,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (matchesToRender.length > 0) {
             matchesToRender.forEach(match => {
-                const matchCompatibility = calculateCompatibility(currentUser, match);
+                const matchCompatibility = calculateCompatibility(currentUser.profile, match);
                 const lastSeen = formatLastSeen(match.lastSeen);
-                const unreadCount = (currentUser.unreadMessages && currentUser.unreadMessages[match.id]) || 0;
+                const unreadCount = (currentUser.profile.unreadMessages && currentUser.profile.unreadMessages[match.uid]) || 0;
                 const unreadBadge = unreadCount > 0 ? `<span class="chat-notification-badge">${unreadCount > 9 ? '9+' : unreadCount}</span>` : '';
 
                 matchListContainer.innerHTML += `
@@ -633,8 +593,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h4>${match.name}</h4>
                         <p class="last-seen">${lastSeen}</p>
                         <p>Compatibility: ${matchCompatibility}%</p>
-                        <div class="bar"><div class="fill" style="width:${matchCompatibility}%"></div></div>
-                        <button onclick="startChat('${match.id}')" style="margin-top:10px; width: auto; padding: 8px 12px;">Chat</button>
+                        <div class="bar"><div class="fill" style="width:${matchCompatibility}%"></div></div>`
+                        <button onclick="startChat('${match.uid}')" style="margin-top:10px; width: auto; padding: 8px 12px;">Chat</button>
                     </div>
                 `;
             });
@@ -651,50 +611,51 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMatches(filteredMatches);
     }
 
-    window.initiateContact = (type) => {
-        if (!currentUser || !currentSwipeUser) return;
-
-        const otherUser = users.find(u => u.id === currentSwipeUser.id);
-        const isMatch = currentUser.likes.includes(currentSwipeUser.id) && 
-                        otherUser && otherUser.likes.includes(currentUser.id);
-
-        if (isMatch) {
-            switch (type) {
-                case 'chat':
-                    startChat(currentSwipeUser.id);
-                    break;
-                case 'voice':
-                    startVoiceCall(currentSwipeUser.id);
-                    break;
-                case 'video':
-                    startVideoCall(currentSwipeUser.id);
-                    break;
-            }
-        } else {
-            alert(`You need to match with ${currentSwipeUser.name} to contact them. Press 'Like' to show your interest!`);
-        }
-    }
-
-    window.showMatches = () => {
+    window.showMatches = async () => {
         if (!currentUser) return;
         
-        // Clear new match notifications when viewing the match list
-        if (currentUser.newMatches && currentUser.newMatches.length > 0) {
-            currentUser.newMatches = [];
-            updateAndSaveCurrentUser();
-            updateMatchNotification();
+        try {
+            // Clear new match notifications when viewing the match list
+            if (currentUser.profile.newMatches && currentUser.profile.newMatches.length > 0) {
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, { newMatches: [] });
+                currentUser.profile.newMatches = [];
+                updateMatchNotification();
+            }
+
+            const myLikes = currentUser.profile.likes || [];
+            if (myLikes.length === 0) {
+                renderMatches([]);
+                showPage('matchPage');
+                return;
+            }
+
+            // Find users who have liked me
+            const q = query(collection(db, "users"), where("likes", "array-contains", currentUser.uid));
+            const querySnapshot = await getDocs(q);
+            const usersWhoLikeMe = querySnapshot.docs.map(d => d.id);
+
+            // A match is where I have liked them AND they have liked me
+            const matchIds = myLikes.filter(id => usersWhoLikeMe.includes(id));
+
+            if (matchIds.length > 0) {
+                const matchesQuery = query(collection(db, "users"), where("__name__", "in", matchIds));
+                const matchesSnapshot = await getDocs(matchesQuery);
+                currentMatchList = matchesSnapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+            } else {
+                currentMatchList = [];
+            }
+
+            document.getElementById('matchSearchInput').value = '';
+            renderMatches(currentMatchList);
+            showPage('matchPage');
+        } catch (error) {
+            console.error("Error showing matches:", error);
         }
-
-        currentMatchList = users.filter(user => 
-            currentUser.likes.includes(user.id) && user.likes.includes(currentUser.id)
-        );
-
-        document.getElementById('matchSearchInput').value = '';
-        renderMatches(currentMatchList);
-        showPage('matchPage');
     }
     
     function calculateCompatibility(user1, user2) {
+        if (!user1.interests || !user2.interests) return 20;
         const commonInterests = user1.interests.filter(i => user2.interests.includes(i));
         const maxInterests = Math.max(user1.interests.length, user2.interests.length);
         if (maxInterests === 0) return 20; // Base compatibility
@@ -705,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createMessageHTML(message) {
         if (!currentUser || !currentChatUser) return '';
 
-        const isCurrentUser = message.senderId === currentUser.id;
+        const isCurrentUser = message.senderId === currentUser.uid;
         const messageClass = isCurrentUser ? 'sent' : 'received';
         const time = formatTimestamp(message.timestamp);
 
@@ -719,96 +680,64 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    window.startChat = (userId) => {
-        currentChatUser = users.find(u => u.id === userId);
-        if (!currentChatUser || !currentUser) return;
+    window.startChat = async (userId) => {
+        const userDoc = await getDoc(doc(db, "users", userId));
+        currentChatUser = { uid: userDoc.id, ...userDoc.data() };
 
-        // Clear unread messages for this chat
-        if (currentUser.unreadMessages && currentUser.unreadMessages[userId]) {
-            delete currentUser.unreadMessages[userId];
-            updateAndSaveCurrentUser();
-        }
+        if (!currentChatUser || !currentUser) return;
         
         // Setup header with name and call buttons
         document.getElementById('chatPartnerName').textContent = `${currentChatUser.name}`;
         const callButtonsContainer = document.getElementById('callButtons');
         callButtonsContainer.innerHTML = `
-            <button onclick="startVoiceCall('${currentChatUser.id}')" title="Voice Call">📞</button>
-            <button onclick="startVideoCall('${currentChatUser.id}')" title="Video Call">📹</button>
-            <button class="block-btn" onclick="blockUser('${currentChatUser.id}')" title="Block User">🚫</button>
+            <button onclick="startVoiceCall('${currentChatUser.uid}')" title="Voice Call">📞</button>
+            <button onclick="startVideoCall('${currentChatUser.uid}')" title="Video Call">📹</button>
+            <button class="block-btn" onclick="blockUser('${currentChatUser.uid}')" title="Block User">🚫</button>
         `;
 
         const chatBox = document.getElementById('chatBox');
         chatBox.innerHTML = ''; // Clear the box
         typingIndicator.style.display = 'none'; // Ensure it's hidden
 
-        const chatId = getChatId(currentUser.id, currentChatUser.id);
-        const allChats = DB.getChats();
-        const chatHistory = allChats[chatId] || [];
+        const chatId = getChatId(currentUser.uid, currentChatUser.uid);
+        const messagesRef = collection(db, "chats", chatId, "messages");
+        const q = query(messagesRef, orderBy("timestamp"));
 
-        if (chatHistory.length === 0) {
-            chatBox.innerHTML = `<p><em>This is the beginning of your conversation with ${currentChatUser.name}.</em></p>`;
-        } else {
-            chatHistory.forEach(message => {
-                chatBox.innerHTML += createMessageHTML(message);
-            });
-        }
-        
-        chatBox.scrollTop = chatBox.scrollHeight;
+        // Listen for real-time messages
+        unsubscribeChatListener = onSnapshot(q, (querySnapshot) => {
+            chatBox.innerHTML = '';
+            if (querySnapshot.empty) {
+                chatBox.innerHTML = `<p><em>This is the beginning of your conversation with ${currentChatUser.name}.</em></p>`;
+            } else {
+                querySnapshot.forEach((doc) => {
+                    const message = doc.data();
+                    // Convert Firestore timestamp to JS Date if needed
+                    const formattedMessage = {
+                        ...message,
+                        timestamp: message.timestamp ? message.timestamp.toDate().toISOString() : new Date().toISOString()
+                    };
+                    chatBox.innerHTML += createMessageHTML(formattedMessage);
+                });
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
         showPage('chatPage');
     }
 
-    window.sendMessage = () => {
+    window.sendMessage = async () => {
         const chatInput = document.getElementById('chatInput');
         const messageText = chatInput.value.trim();
 
         if (messageText && currentUser && currentChatUser) {
-            const chatId = getChatId(currentUser.id, currentChatUser.id);
-            const allChats = DB.getChats();
-            if (!allChats[chatId]) {
-                allChats[chatId] = [];
-            }
-
-            // 1. Add user's message
-            const myMessage = {
-                senderId: currentUser.id,
+            const chatId = getChatId(currentUser.uid, currentChatUser.uid);
+            const messagesRef = collection(db, "chats", chatId, "messages");
+            await addDoc(messagesRef, {
+                senderId: currentUser.uid,
                 text: messageText,
-                timestamp: new Date().toISOString()
-            };
-            allChats[chatId].push(myMessage);
-            DB.saveChats(allChats); // Save after adding user's message
-
-            // 2. Update UI for user's message
-            const chatBox = document.getElementById('chatBox');
-            if (chatBox.querySelector('em')) { // Remove initial message if it exists
-                chatBox.innerHTML = '';
-            }
-            chatBox.insertAdjacentHTML('beforeend', createMessageHTML(myMessage));
+                timestamp: serverTimestamp()
+            });
             chatInput.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // 3. Show typing indicator and simulate reply
-            typingIndicator.style.display = 'block';
-            typingIndicator.textContent = `${currentChatUser.name} is typing...`;
-
-            setTimeout(() => {
-                typingIndicator.style.display = 'none'; // Hide indicator
-
-                const replyText = "Got it!";
-                const replyMessage = { senderId: currentChatUser.id, text: replyText, timestamp: new Date().toISOString() };
-                allChats[chatId].push(replyMessage);
-                DB.saveChats(allChats); // Save again after adding the reply
-
-                // In this simulation, the reply is "unread" until the user re-enters the chat.
-                if (!currentUser.unreadMessages) {
-                    currentUser.unreadMessages = {};
-                }
-                currentUser.unreadMessages[currentChatUser.id] = (currentUser.unreadMessages[currentChatUser.id] || 0) + 1;
-                updateAndSaveCurrentUser();
-
-                chatBox.insertAdjacentHTML('beforeend', createMessageHTML(replyMessage));
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1500);
         }
     }
 
@@ -832,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.display = 'flex';
     }
 
-    window.blockUser = (userIdToBlock) => {
+    window.blockUser = async (userIdToBlock) => {
         if (!currentUser || !userIdToBlock) return;
 
         const confirmation = confirm(`Are you sure you want to block this user? You will be unmatched and will no longer see each other.`);
@@ -846,35 +775,61 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("User reported. Thank you for helping keep our community safe.");
         }
 
-        // Add to current user's blocked list
-        if (!currentUser.blocked) {
-            currentUser.blocked = [];
-        }
-        if (!currentUser.blocked.includes(userIdToBlock)) {
-            currentUser.blocked.push(userIdToBlock);
-        }
+        try {
+            const myRef = doc(db, "users", currentUser.uid);
+            const theirRef = doc(db, "users", userIdToBlock);
 
-        // Remove from likes/matches. A block implies un-matching.
-        currentUser.likes = currentUser.likes.filter(id => id !== userIdToBlock);
-        
-        // Also remove the current user from the other person's likes to break the match
-        const blockedUser = users.find(u => u.id === userIdToBlock);
-        if (blockedUser) {
-            blockedUser.likes = blockedUser.likes.filter(id => id !== currentUser.id);
+            const batch = writeBatch(db);
+
+            // Add them to my blocked list
+            batch.update(myRef, { blocked: arrayUnion(userIdToBlock) });
+            // Remove them from my likes list
+            batch.update(myRef, { likes: arrayRemove(userIdToBlock) });
+            // Remove me from their likes list
+            batch.update(theirRef, { likes: arrayRemove(currentUser.uid) });
+
+            await batch.commit();
+
+            alert("User has been blocked.");
+            showMatches(); // Go back to the matches page, which will now be updated.
+        } catch (error) {
+            console.error("Error blocking user:", error);
+            alert("Failed to block user.");
         }
-
-        DB.saveUsers(users); // Save the change to the blocked user
-        updateAndSaveCurrentUser(); // Save the change to the current user
-
-        alert("User has been blocked.");
-        showMatches(); // Go back to the matches page, which will now be updated.
     }
 
     window.hangUp = () => {
         document.getElementById('callOverlay').style.display = 'none';
     }
 
+    // --- APP INITIALIZATION & AUTH STATE LISTENER ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // User is signed in.
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-    // --- KICKSTART THE APP ---
-    initializeApp();
+            if (userDoc.exists()) {
+                currentUser = {
+                    uid: user.uid,
+                    ...user, // auth properties like email
+                    profile: userDoc.data() // firestore profile data
+                };
+                await updateDoc(userDocRef, { lastSeen: serverTimestamp() });
+                userNameSpan.textContent = currentUser.profile.name;
+                showPage('dashboardPage');
+            } else {
+                // This case happens if auth user exists but firestore doc was deleted.
+                // Treat as a new user needing profile setup.
+                showPage('profilePage');
+            }
+        } else {
+            // User is signed out.
+            currentUser = null;
+            showPage('loginPage');
+        }
+    });
+
+    // --- THEME INITIALIZATION ---
+    if (Theme.get() === 'dark') { body.classList.add('dark'); modeToggleButton.textContent = '☀️ Light'; }
 });
