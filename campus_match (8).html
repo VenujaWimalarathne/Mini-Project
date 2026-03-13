@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== CAMPUS MATCH — REDESIGNED UI ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --rose:       #e8637a;
+  --rose-deep:  #c94060;
+  --blush:      #fce8ed;
+  --petal:      #f9d2db;
+  --cream:      #fdf6f8;
+  --ink:        #1a0a0f;
+  --smoke:      #6b4a52;
+  --glass:      rgba(255,255,255,0.62);
+  --glass-border: rgba(255,255,255,0.75);
+  --shadow:     0 24px 60px rgba(180,60,90,0.18);
+  --shadow-sm:  0 8px 24px rgba(180,60,90,0.12);
+  --radius:     22px;
+  --radius-sm:  14px;
+
+  --bg-login:    linear-gradient(135deg, #fde8ef 0%, #f8c8d4 50%, #f3a8be 100%);
+  --bg-signup:   linear-gradient(135deg, #e0f0ff 0%, #c8dcf8 50%, #b8c8f0 100%);
+  --bg-profile:  linear-gradient(135deg, #fef3e2 0%, #fce8c8 50%, #f8d8b0 100%);
+  --bg-dash:     linear-gradient(135deg, #fff0f3 0%, #fcd8e0 50%, #f8c0cc 100%);
+  --bg-swipe:    linear-gradient(135deg, #f0f8ff 0%, #d8ecf8 50%, #c8e0f4 100%);
+  --bg-match:    linear-gradient(135deg, #f8f0ff 0%, #ead8f8 50%, #dcc0f0 100%);
+  --bg-chat:     linear-gradient(135deg, #fffaf0 0%, #fef0d0 50%, #fde8b8 100%);
+  --bg-verify:   linear-gradient(135deg, #f0fff4 0%, #d0f0e0 50%, #b8e8d0 100%);
+  --bg-settings: linear-gradient(135deg, #f0f8ff 0%, #d8eeff 50%, #c0e0ff 100%);
+}
+
+body.dark {
+  --glass:        rgba(20, 8, 12, 0.72);
+  --glass-border: rgba(255,255,255,0.10);
+  --shadow:       0 24px 60px rgba(0,0,0,0.50);
+  --shadow-sm:    0 8px 24px rgba(0,0,0,0.38);
+  --cream:        #120608;
+  --ink:          #fde8ed;
+  --smoke:        #c8a0a8;
+  --blush:        rgba(255,255,255,0.06);
+
+  --bg-login:    linear-gradient(135deg, #2a0a12 0%, #3a1020 50%, #1e0810 100%);
+  --bg-signup:   linear-gradient(135deg, #0a1020 0%, #101828 50%, #0c1430 100%);
+  --bg-profile:  linear-gradient(135deg, #1a1008 0%, #281808 50%, #200e04 100%);
+  --bg-dash:     linear-gradient(135deg, #1a0810 0%, #280c18 50%, #200a14 100%);
+  --bg-swipe:    linear-gradient(135deg, #081018 0%, #0c1828 50%, #081420 100%);
+  --bg-match:    linear-gradient(135deg, #100818 0%, #180c28 50%, #140820 100%);
+  --bg-chat:     linear-gradient(135deg, #181008 0%, #261808 50%, #1e1204 100%);
+  --bg-verify:   linear-gradient(135deg, #081410 0%, #0c2018 50%, #081c14 100%);
+  --bg-settings: linear-gradient(135deg, #081018 0%, #0c1828 50%, #081420 100%);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: background 0.65s ease;
+  background-image: url('WhatsApp Image 2026-03-12 at 14.48.10.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(232,99,122,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 80%, rgba(180,60,100,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(252,184,200,0.10) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: meshDrift 20s ease-in-out infinite alternate;
+}
+
+@keyframes meshDrift {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 1;   transform: scale(1.05); }
+}
+
+body.dark::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(200,40,80,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 80%, rgba(120,20,50,0.10) 0%, transparent 70%);
+}
+
+/* ===== WATERMARK ===== */
+.watermark {
+  position: fixed;
+  top: 50%; left: 50%;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 96px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: transparent;
+  background: linear-gradient(135deg, rgba(232,99,122,0.22), rgba(180,60,90,0.12), rgba(232,99,122,0.22));
+  -webkit-background-clip: text;
+  background-clip: text;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 0;
+  animation: watermarkFloat 16s ease-in-out infinite;
+  user-select: none;
+}
+
+@keyframes watermarkFloat {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-18deg) translateY(0); }
+  50%       { transform: translate(-50%, -50%) rotate(-18deg) translateY(-16px); }
+}
+
+/* ===== FLOATING ICONS ===== */
+.floating-container {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.floating-icon {
+  position: absolute; bottom: -60px;
+  animation: floatUp 18s linear infinite;
+  opacity: 0; font-size: 20px;
+  filter: blur(0.3px);
+}
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+  15%  { opacity: 0.45; }
+  85%  { opacity: 0.45; }
+  100% { transform: translateY(-115vh) rotate(380deg) scale(1.2); opacity: 0; }
+}
+.floating-icon:nth-child(1) { left: 8%;  animation-duration: 14s; animation-delay: 0s;   font-size: 22px; }
+.floating-icon:nth-child(2) { left: 23%; animation-duration: 19s; animation-delay: 3.5s; font-size: 16px; }
+.floating-icon:nth-child(3) { left: 42%; animation-duration: 12s; animation-delay: 1.5s; font-size: 26px; }
+.floating-icon:nth-child(4) { left: 61%; animation-duration: 22s; animation-delay: 5s;   font-size: 18px; }
+.floating-icon:nth-child(5) { left: 78%; animation-duration: 16s; animation-delay: 0.8s; font-size: 20px; }
+.floating-icon:nth-child(6) { left: 92%; animation-duration: 20s; animation-delay: 4.2s; font-size: 24px; }
+
+/* ===== FOOTER WATERMARK ===== */
+.watermark-footer {
+  position: fixed; bottom: 14px; right: 20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: rgba(201, 64, 96, 0.4);
+  pointer-events: none; z-index: 9999;
+}
+
+/* ===== FLOATING HEARTS ===== */
+.heart {
+  position: fixed; bottom: -50px; width: 16px; height: 16px;
+  background: transparent; transform: rotate(45deg);
+  animation: floatHeart 12s infinite linear;
+  z-index: 0; opacity: 0;
+}
+.heart::before, .heart::after {
+  content: ''; position: absolute; width: 16px; height: 16px;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  border-radius: 50%;
+}
+.heart::before { top: -8px; left: 0; }
+.heart::after  { left: 8px; top: 0; }
+@keyframes floatHeart {
+  0%   { transform: translateY(0) rotate(45deg) scale(0.6); opacity: 0.6; }
+  100% { transform: translateY(-100vh) rotate(45deg) scale(1.4); opacity: 0; }
+}
+
+/* ===== DARK / LIGHT TOGGLE ===== */
+#modeToggle {
+  position: fixed; top: 18px; right: 18px;
+  padding: 9px 18px;
+  width: auto;
+  border-radius: 50px;
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  color: var(--rose-deep);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  margin-top: 0;
+}
+#modeToggle:hover {
+  transform: scale(1.06) translateY(-1px);
+  box-shadow: var(--shadow);
+  background: var(--rose);
+  color: white;
+  border-color: var(--rose);
+}
+body.dark #modeToggle { color: #f4a0b0; }
+body.dark #modeToggle:hover { color: white; }
+
+/* ===== GLASSMORPHIC CONTAINER ===== */
+.container {
+  display: none;
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  width: 92%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative; z-index: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232,99,122,0.3) transparent;
+}
+.container::-webkit-scrollbar { width: 4px; }
+.container::-webkit-scrollbar-thumb { background: rgba(232,99,122,0.3); border-radius: 4px; }
+
+.container.active {
+  display: block;
+  animation: slideUp 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.container::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: var(--radius);
+  opacity: 0.45;
+  z-index: -1;
+  transition: opacity 0.5s;
+}
+#loginPage::before    { background: var(--bg-login); }
+#signupPage::before   { background: var(--bg-signup); }
+#profilePage::before  { background: var(--bg-profile); }
+#dashboardPage::before{ background: var(--bg-dash); }
+#swipePage::before    { background: var(--bg-swipe); }
+#matchPage::before    { background: var(--bg-match); }
+#chatPage::before     { background: var(--bg-chat); }
+#verificationPage::before { background: var(--bg-verify); }
+#settingsPage::before { background: var(--bg-settings); }
+
+/* ===== HEADINGS ===== */
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--rose-deep);
+  letter-spacing: 0.02em;
+  margin-bottom: 22px;
+  line-height: 1.2;
+}
+body.dark h2 { color: #f09aaa; }
+
+/* ===== INPUTS ===== */
+input, select, textarea {
+  width: 100%;
+  margin: 8px 0;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(232,99,122,0.18);
+  background: rgba(255,255,255,0.48);
+  backdrop-filter: blur(8px);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink);
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  outline: none;
+}
+input::placeholder, textarea::placeholder { color: #b08090; }
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--rose);
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 0 0 3px rgba(232,99,122,0.15);
+  transform: translateY(-1px);
+}
+
+select {
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8637a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+}
+
+textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+body.dark input, body.dark select, body.dark textarea {
+  color: #f0d8e0;
+  background: rgba(20, 5, 10, 0.55);
+  border-color: rgba(232,99,122,0.25);
+}
+body.dark input::placeholder, body.dark textarea::placeholder { color: #806070; }
+body.dark input:focus, body.dark select:focus, body.dark textarea:focus {
+  background: rgba(40, 10, 18, 0.75);
+  border-color: #e8637a;
+  box-shadow: 0 0 0 3px rgba(232,99,122,0.20);
+}
+
+/* ===== PASSWORD WRAPPER ===== */
+.password-wrapper { position: relative; width: 100%; margin: 8px 0; }
+.password-wrapper input { margin: 0; padding-right: 46px; }
+.password-toggle {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; font-size: 16px; opacity: 0.55;
+  transition: opacity 0.2s; user-select: none; z-index: 2;
+}
+.password-toggle:hover { opacity: 0.9; }
+
+/* ===== PASSWORD STRENGTH ===== */
+#passwordStrengthIndicator { margin: 2px 0 10px; }
+#strength-bar {
+  height: 4px; width: 0%; background: #ddd;
+  border-radius: 4px; transition: width 0.4s ease, background-color 0.4s ease;
+}
+#strength-text {
+  font-size: 11px; color: var(--smoke); margin-top: 4px; display: block;
+  font-weight: 500; letter-spacing: 0.02em;
+}
+body.dark #strength-text { color: #b09098; }
+
+/* ===== BUTTONS ===== */
+button {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 6px 20px rgba(232,99,122,0.38);
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+button::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+button:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 12px 30px rgba(232,99,122,0.48);
+}
+
+button:active { transform: translateY(0) scale(0.99); }
+
+#deleteAccountBtn {
+  background: linear-gradient(135deg, #e84040, #c02020);
+  box-shadow: 0 6px 20px rgba(220,40,40,0.35);
+}
+
+/* ===== NOTIFICATION BADGE ===== */
+.notification-wrapper { position: relative; width: 100%; margin-top: 10px; }
+.notification-wrapper button { margin-top: 0; }
+
+#matchNotificationBadge {
+  position: absolute; top: 8px; right: 12px;
+  background: linear-gradient(135deg, #e84040, #c02020);
+  color: white; border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 11px; font-weight: 700;
+  box-shadow: 0 2px 8px rgba(220,40,40,0.5);
+}
+
+/* ===== LINKS ===== */
+a { color: var(--rose); font-weight: 500; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
+a:hover { opacity: 0.75; text-decoration: underline; }
+
+p { font-size: 14px; color: var(--smoke); line-height: 1.6; }
+body.dark p { color: #c0a0a8; }
+
+label { font-size: 13px; font-weight: 500; color: var(--smoke); display: block; margin: 8px 0 2px; letter-spacing: 0.02em; }
+body.dark label { color: #b090a0; }
+
+hr { border: none; border-top: 1px solid rgba(232,99,122,0.18); margin: 20px 0; }
+
+.demo-note {
+  font-size: 12.5px; color: var(--smoke);
+  text-align: center; margin-top: 6px;
+  font-style: italic; opacity: 0.75;
+}
+body.dark .demo-note { color: #a08090; }
+
+/* ===== CARDS ===== */
+.card {
+  position: relative;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 12px 0;
+  border: 1.5px solid rgba(255,255,255,0.65);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+body.dark .card {
+  background: rgba(30, 8, 14, 0.55);
+  border-color: rgba(232,99,122,0.15);
+}
+.card img { width: 100%; border-radius: var(--radius-sm); margin-top: 10px; object-fit: cover; max-height: 220px; }
+
+.card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 600;
+  color: var(--rose-deep); margin-top: 12px;
+}
+.card p { font-size: 13px; margin-top: 4px; }
+body.dark .card h3 { color: #f0a0b0; }
+
+.swipe-card-actions {
+  display: flex; justify-content: center; gap: 16px;
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid rgba(232,99,122,0.12);
+}
+.swipe-card-actions button {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  font-size: 20px; margin-top: 0; padding: 0;
+  line-height: 54px; flex-shrink: 0;
+}
+
+body.dark .swipe-card-actions { border-top: 1px solid rgba(232,99,122,0.1); }
+
+/* ===== MATCH BAR ===== */
+.bar {
+  background: rgba(232,99,122,0.12);
+  height: 8px; border-radius: 8px; overflow: hidden; margin-top: 8px;
+}
+.fill {
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+  height: 100%; transition: width 0.6s cubic-bezier(0.23,1,0.32,1);
+  border-radius: 8px;
+}
+
+/* ===== CHAT NOTIFICATION BADGE ===== */
+.chat-notification-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: linear-gradient(135deg, #4a90e2, #2a60c2);
+  color: white; border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 11px; font-weight: 700;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(74,144,226,0.4);
+}
+body.dark .chat-notification-badge { border-color: #1a0810; }
+
+/* ===== LAST SEEN ===== */
+.last-seen {
+  font-size: 11.5px; color: var(--smoke);
+  margin: -6px 0 10px; font-weight: 500;
+}
+body.dark .last-seen { color: #a08090; }
+
+/* ===== INTERESTS GRID ===== */
+.interests-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 10px 0;
+}
+.interests-grid label {
+  background: rgba(255,255,255,0.35);
+  padding: 9px 10px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: all 0.25s;
+  border: 1.5px solid transparent;
+  font-size: 13.5px; font-weight: 400;
+  color: var(--ink);
+}
+.interests-grid label:hover { background: rgba(232,99,122,0.10); border-color: rgba(232,99,122,0.3); }
+.interests-grid input[type="checkbox"] { width: auto; margin: 0; accent-color: var(--rose); }
+body.dark .interests-grid label { background: rgba(0,0,0,0.25); color: #e0c0c8; }
+body.dark .interests-grid label:hover { background: rgba(232,99,122,0.12); }
+
+/* ===== CHAT UI ===== */
+.chat-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(232,99,122,0.15);
+}
+.chat-header h2 { margin-bottom: 0; font-size: 1.4rem; }
+
+#callButtons { display: flex; gap: 6px; }
+#callButtons button {
+  width: 38px; height: 38px; border-radius: 50%;
+  padding: 0; margin: 0; font-size: 16px; line-height: 38px;
+  box-shadow: var(--shadow-sm); flex-shrink: 0;
+}
+#callButtons .block-btn {
+  background: linear-gradient(135deg, #e84040, #c02020);
+}
+
+#chatBox {
+  height: 200px; overflow-y: auto; overflow-x: hidden;
+  border-radius: var(--radius-sm); padding: 12px;
+  background: rgba(255,255,255,0.28);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  margin-bottom: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232,99,122,0.3) transparent;
+}
+body.dark #chatBox { background: rgba(10,2,6,0.45); border-color: rgba(232,99,122,0.12); }
+
+#typingIndicator {
+  padding: 5px 12px; font-style: italic;
+  color: var(--smoke); font-size: 13px; height: 26px;
+  box-sizing: border-box;
+}
+body.dark #typingIndicator { color: #a09098; }
+
+/* ===== MESSAGE BUBBLES ===== */
+.message-container { display: flex; margin-bottom: 8px; }
+.message-container.sent  { justify-content: flex-end; }
+.message-container.received { justify-content: flex-start; }
+
+.message-bubble {
+  max-width: 72%; padding: 9px 13px;
+  border-radius: 18px; position: relative;
+}
+.message-container.sent .message-bubble {
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: white; border-bottom-right-radius: 5px;
+  box-shadow: 0 4px 12px rgba(232,99,122,0.25);
+}
+.message-container.received .message-bubble {
+  background: rgba(255,255,255,0.55); color: var(--ink);
+  border-bottom-left-radius: 5px; border: 1px solid rgba(255,255,255,0.75);
+}
+body.dark .message-container.received .message-bubble {
+  background: rgba(20,5,10,0.55); color: #f0d0d8;
+  border-color: rgba(232,99,122,0.15);
+}
+.message-text { margin: 0; padding: 0; font-size: 14px; line-height: 1.45; }
+.message-time {
+  font-size: 10px; display: block; text-align: right; margin-top: 4px; opacity: 0.65;
+}
+
+/* ===== CALL OVERLAY ===== */
+#callOverlay {
+  position: fixed; inset: 0;
+  background: rgba(10,2,8,0.82); backdrop-filter: blur(16px);
+  display: none; justify-content: center; align-items: center; z-index: 100;
+}
+.call-container { text-align: center; color: white; }
+.call-container img {
+  width: 110px; height: 110px; border-radius: 50%;
+  border: 3px solid rgba(232,99,122,0.6);
+  margin-bottom: 20px; box-shadow: 0 0 40px rgba(232,99,122,0.4);
+  animation: callPulse 2s ease-in-out infinite;
+}
+@keyframes callPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(232,99,122,0.3), 0 0 0 0 rgba(232,99,122,0.25); }
+  50%       { box-shadow: 0 0 50px rgba(232,99,122,0.5), 0 0 0 18px rgba(232,99,122,0); }
+}
+.call-container h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 6px; }
+.call-container p  { font-size: 16px; margin-bottom: 28px; opacity: 0.75; }
+#hangUpButton {
+  background: linear-gradient(135deg, #e84040, #c02020);
+  box-shadow: 0 8px 24px rgba(220,40,40,0.45);
+  width: auto; padding: 13px 36px;
+}
+
+/* ===== SEARCH INPUT ===== */
+input[type="search"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8637a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 42px;
+}
+
+/* ===== FILE INPUT ===== */
+input[type="file"] {
+  padding: 10px 14px; font-size: 13px;
+  border-style: dashed; border-color: rgba(232,99,122,0.3);
+  background: rgba(255,255,255,0.25); cursor: pointer;
+}
+input[type="file"]:hover { border-color: var(--rose); background: rgba(232,99,122,0.06); }
+
+#preview {
+  display: none; width: 100%; border-radius: var(--radius-sm);
+  margin-top: 12px; object-fit: cover; max-height: 240px;
+  box-shadow: var(--shadow-sm); border: 2px solid rgba(232,99,122,0.2);
+}
+
+#camera { border-radius: var(--radius-sm); margin-bottom: 10px; display: none; box-shadow: var(--shadow-sm); }
+
+
+/* ===== MATCH TABS ===== */
+.match-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+.match-tab-button {
+    flex: 1;
+    padding: 8px;
+    cursor: pointer;
+    border: 1.5px solid rgba(232,99,122,0.3);
+    background: transparent;
+    color: var(--rose);
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.match-tab-button:hover {
+    background: rgba(232,99,122,0.1);
+}
+.match-tab-button.active {
+    background: var(--rose);
+    color: white;
+    border-color: var(--rose);
+    box-shadow: 0 4px 12px rgba(232,99,122,0.25);
+}
+.match-tab-content {
+    display: none;
+}
+.match-tab-content button {
+    width: 100%;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .watermark { font-size: 52px; }
+  .container { padding: 24px 20px; width: 96%; }
+  .interests-grid { grid-template-columns: 1fr; }
+  h2 { font-size: 1.6rem; }
+  button { font-size: 13.5px; padding: 13px 16px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Animated Watermark -->
+<div class="watermark">Campus Match</div>
+
+<!-- Romantic Floating Icons -->
+<div class="floating-container">
+    <div class="floating-icon">❤️</div>
+    <div class="floating-icon">🌹</div>
+    <div class="floating-icon">💌</div>
+    <div class="floating-icon">💕</div>
+    <div class="floating-icon">💖</div>
+    <div class="floating-icon">💍</div>
+</div>
+
+<!-- Fixed Footer Watermark -->
+<div class="watermark-footer">Campus Match © 2024</div>
+
+<!-- Dark/Light Toggle -->
+<button id="modeToggle">🌙 Dark</button>
+
+<div class="heart" style="left:15%; animation-delay: 0s;"></div>
+<div class="heart" style="left:35%; animation-delay: 2s;"></div>
+<div class="heart" style="left:55%; animation-delay: 4s;"></div>
+<div class="heart" style="left:75%; animation-delay: 6s;"></div>
+
+<!-- LOGIN -->
+<div id="loginPage" class="container active">
+<h2>Login</h2>
+<input id="loginIdentifier" type="text" placeholder="Email or University ID">
+<div class="password-wrapper">
+    <input id="loginPass" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<button onclick="login()">Login</button>
+<p style="font-size: 14px; text-align: right; margin-top: 5px;"><a onclick="forgotPassword()" style="cursor:pointer">Forgot Password?</a></p>
+<p>No account? <a onclick="showPage('signupPage')" style="cursor:pointer">Signup</a></p>
+</div>
+
+<!-- SIGNUP -->
+<div id="signupPage" class="container">
+<h2 style="text-align:center">Signup</h2>
+<input id="name" placeholder="Full Name">
+<input id="email" type="email" placeholder="Email Address">
+<input id="age" placeholder="Age">
+<select id="gender"><option>Male</option><option>Female</option></select>
+<select id="pref"><option>Male</option><option>Female</option><option>Any</option></select>
+<input id="faculty" placeholder="Faculty (e.g. Computer Science)">
+<input id="year" placeholder="Year">
+<input id="studentID" placeholder="Student ID">
+<div class="password-wrapper">
+    <input id="password" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div id="passwordStrengthIndicator">
+    <div id="strength-bar"></div>
+    <span id="strength-text"></span>
+</div>
+<div class="password-wrapper">
+    <input id="confirmPassword" type="password" placeholder="Confirm Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<button onclick="signup()">Signup</button>
+<p>Already have an account? <a onclick="showPage('loginPage')" style="cursor:pointer">Login</a></p>
+</div>
+
+<!-- VERIFICATION -->
+<div id="verificationPage" class="container">
+    <h2 style="text-align:center">Verify Your Email</h2>
+    <p>A verification link has been sent to <strong id="verificationEmail">your email address</strong>. Please check your inbox and click the link to complete your registration.</p>
+    <p class="demo-note">(Since this is a demo without a backend server, no email is actually sent. You can proceed by clicking the button below.)</p>
+    <button onclick="verifyCode()">Simulate Email Verification</button>
+    <button id="resendVerificationBtn" onclick="resendVerification()">Resend Link</button>
+    <p style="margin-top: 10px; text-align: center;"><a onclick="showPage('loginPage')" style="cursor:pointer">Back to Login</a></p>
+</div>
+
+<!-- PROFILE -->
+<div id="profilePage" class="container">
+<h2 style="text-align:center">Profile Setup</h2>
+<textarea id="bio" placeholder="Short bio"></textarea>
+<label>Take Photo:</label>
+<video id="camera" width="100%" autoplay style="border-radius: 15px; margin-bottom: 10px; display:none;"></video>
+<canvas id="canvas" style="display:none"></canvas>
+<button onclick="startCamera()">Open Camera</button>
+<button onclick="takePhoto()">Take Photo</button>
+<label style="text-align:center; display:block; margin-top:10px;">OR Upload Image (Max 2MB)</label>
+<input type="file" id="upload" onchange="checkFileSize()">
+<img id="preview" class="preview" alt="Image Preview" style="display:none; width:100%; border-radius:15px; margin-top:10px;">
+
+<label style="text-align:center; display:block; margin-top:10px;">Interests:</label>
+<div class="interests-grid">
+  <label><input type="checkbox" value="Music"> Music</label>
+  <label><input type="checkbox" value="Sports"> Sports</label>
+  <label><input type="checkbox" value="Coding"> Coding</label>
+  <label><input type="checkbox" value="Movies"> Movies</label>
+  <label><input type="checkbox" value="Art"> Art</label>
+  <label><input type="checkbox" value="Travel"> Travel</label>
+  <label><input type="checkbox" value="Photography"> Photography</label>
+  <label><input type="checkbox" value="Gaming"> Gaming</label>
+  <label><input type="checkbox" value="Food"> Food</label>
+  <label><input type="checkbox" value="Fitness"> Fitness</label>
+  <label><input type="checkbox" value="Reading"> Reading</label>
+  <label><input type="checkbox" value="Dancing"> Dancing</label>
+</div>
+<label style="text-align:center; display:block; margin-top:14px; font-weight:600; color:var(--rose-deep);">🔗 Connecting Details <span style="font-size:11px;font-weight:400;opacity:0.65;">(only visible to mutual matches)</span></label>
+<input id="insta" placeholder="Instagram username (e.g. @yourname)">
+<input id="facebook" placeholder="Facebook profile URL or name">
+<div style="position:relative;">
+  <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:#888;pointer-events:none;z-index:2;">+94</span>
+  <input id="whatsapp" placeholder="WhatsApp number (e.g. 771234567)" style="padding-left:44px;" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+<button onclick="saveProfile()">Save Profile</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardPage" class="container">
+<h2 style="text-align:center">Welcome <span id="userName"></span></h2>
+<button onclick="startSwipe()">Discover People</button>
+<button onclick="showMatches()">Find Matches</button>
+<button onclick="showPage('profilePage')">Edit Profile</button>
+<button onclick="showSettingsPage()">Account Settings</button>
+<input type="file" id="csvImportInput" accept=".csv" style="display:none;" onchange="handleCSVImport(event)">
+<button onclick="logout()" style="background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;margin-top:10px;">Logout</button>
+</div>
+
+<!-- SETTINGS -->
+<div id="settingsPage" class="container">
+<h2 style="text-align:center">Account Settings</h2>
+<label>Current Password (required for changes)</label>
+<input id="currentPass" type="password" placeholder="Enter current password">
+<hr style="border: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+<label>New Email</label>
+<input id="newEmail" type="email" placeholder="Enter new email address">
+<label>New Password</label>
+<div class="password-wrapper">
+    <input id="currentPass" type="password" placeholder="Enter current password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div class="password-wrapper">
+    <input id="newPass" type="password" placeholder="Enter new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<div class="password-wrapper">
+    <input id="confirmNewPass" type="password" placeholder="Confirm new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+</div>
+<button onclick="saveSettings()">Save Changes</button>
+<button id="deleteAccountBtn" onclick="deleteAccount()">Delete Account</button>
+<button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- SWIPE -->
+<div id="swipePage" class="container">
+<h2 style="text-align:center">Discover People</h2>
+<div id="swipeCard"></div>
+<button onclick="likeUser()">❤️ Like</button>
+<button onclick="passUser()">❌ Pass</button>
+<button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- MATCHES -->
+<div id="matchPage" class="container">
+  <h2 style="text-align:center">Find People</h2>
+
+  <!-- Tabs -->
+  <div id="matchTabs" style="display:flex;gap:8px;margin-bottom:14px;">
+    <button id="tabMatches" onclick="switchMatchTab('matches')"
+      style="flex:1;margin:0;padding:10px;border-radius:50px;font-size:13px;">
+      💞 My Matches
+    </button>
+    <button id="tabAll" onclick="switchMatchTab('all')"
+      style="flex:1;margin:0;padding:10px;border-radius:50px;font-size:13px;background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;">
+      🔍 All Profiles
+    </button>
+  </div>
+
+  <!-- Search bar -->
+  <input type="search" id="matchSearchInput" oninput="filterMatches()"
+    placeholder="Search by name, faculty, interests…" style="margin-bottom:4px;">
+
+  <!-- Filters row (shown only in All Profiles tab) -->
+  <div id="matchFilters" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+    <select id="filterGender" onchange="filterMatches()" style="flex:1;min-width:110px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <select id="filterFaculty" onchange="filterMatches()" style="flex:1;min-width:130px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Faculty</option>
+    </select>
+    <select id="filterYear" onchange="filterMatches()" style="flex:1;min-width:90px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Year</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4">Year 4</option>
+      <option value="5">Year 5</option>
+    </select>
+  </div>
+
+  <!-- Result count -->
+  <p id="matchResultCount" style="font-size:12px;text-align:right;margin-bottom:6px;opacity:0.6;"></p>
+
+  <div id="matchList"></div>
+  <button onclick="showPage('dashboardPage')" style="background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;margin-top:6px;">Back</button>
+</div>
+
+<!-- CHAT -->
+<div id="chatPage" class="container">
+<div class="chat-header">
+  <h2 id="chatPartnerName" style="text-align:center; margin: 0; flex-grow: 1;">Chat</h2>
+  <div id="callButtons"></div>
+</div>
+<div id="chatBox" style="height:200px;overflow:auto;border:1px solid #ccc;padding:10px"></div>
+<div id="typingIndicator" style="display: none;"></div>
+<input id="chatInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+<button onclick="showPage('matchPage')">Back</button>
+</div>
+
+<!-- CALL OVERLAY -->
+<div id="callOverlay">
+    <div class="call-container">
+        <img id="callPartnerAvatar" src="" alt="Avatar">
+        <h3 id="callStatus">Calling...</h3>
+        <p id="callPartnerNameOverlay"></p>
+        <button id="hangUpButton" onclick="hangUp()">Hang Up</button>
+    </div>
+</div>
+
+<script>
+// --- DATA STORAGE (localStorage + CSV) ---
+const DB = {
+    _usersKey: 'campusMatchUsers',
+    _currentUserKey: 'campusMatchCurrentUser',
+    _themeKey: 'campusMatchTheme',
+    _chatsKey: 'campusMatchChats',
+    _csvKey: 'campusMatchCSV',
+
+    getUsers: function() {
+        const stored = localStorage.getItem(this._usersKey);
+        return stored ? JSON.parse(stored) : null;
+    },
+    saveUsers: function(usersArray) {
+        localStorage.setItem(this._usersKey, JSON.stringify(usersArray));
+        localStorage.setItem(this._csvKey, this.usersToCSV(usersArray));
+    },
+    getCurrentUserId: function() {
+        return localStorage.getItem(this._currentUserKey);
+    },
+    setCurrentUserId: function(userId) {
+        if (userId) {
+            localStorage.setItem(this._currentUserKey, userId);
+        } else {
+            localStorage.removeItem(this._currentUserKey);
+        }
+    },
+    getTheme: function() {
+        return localStorage.getItem(this._themeKey);
+    },
+    setTheme: function(theme) {
+        localStorage.setItem(this._themeKey, theme);
+    },
+    getChats: function() {
+        const stored = localStorage.getItem(this._chatsKey);
+        return stored ? JSON.parse(stored) : {};
+    },
+    saveChats: function(chatsObject) {
+        localStorage.setItem(this._chatsKey, JSON.stringify(chatsObject));
+    },
+
+    // --- CSV UTILITIES ---
+    CSV_HEADERS: ['id','password','name','email','age','gender','preference','faculty','year','bio','photo','insta','interests','likes','passes','blocked','newMatches'],
+
+    _escapeCSV: function(value) {
+        if (value === null || value === undefined) return '';
+        const str = String(value);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    },
+
+    _parseCSVLine: function(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+                else { inQuotes = !inQuotes; }
+            } else if (ch === ',' && !inQuotes) {
+                result.push(current); current = '';
+            } else {
+                current += ch;
+            }
+        }
+        result.push(current);
+        return result;
+    },
+
+    usersToCSV: function(usersArray) {
+        const rows = [this.CSV_HEADERS.join(',')];
+        usersArray.forEach(user => {
+            const photoVal = user.photo && user.photo.startsWith('data:') ? '[photo_data]' : (user.photo || '');
+            const row = [
+                user.id, user.password, user.name, user.email, user.age,
+                user.gender, user.preference, user.faculty, user.year,
+                user.bio || '', photoVal, user.insta || '',
+                (user.interests || []).join('|'),
+                (user.likes || []).join('|'),
+                (user.passes || []).join('|'),
+                (user.blocked || []).join('|'),
+                (user.newMatches || []).join('|')
+            ].map(v => this._escapeCSV(v));
+            rows.push(row.join(','));
+        });
+        return rows.join('\n');
+    },
+
+    csvToUsers: function(csvText, existingUsers) {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) return null;
+        const headers = this._parseCSVLine(lines[0]);
+        const parsed = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const vals = this._parseCSVLine(lines[i]);
+            const obj = {};
+            headers.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
+            obj.interests  = obj.interests  ? obj.interests.split('|').filter(Boolean)  : [];
+            obj.likes      = obj.likes      ? obj.likes.split('|').filter(Boolean)      : [];
+            obj.passes     = obj.passes     ? obj.passes.split('|').filter(Boolean)     : [];
+            obj.blocked    = obj.blocked    ? obj.blocked.split('|').filter(Boolean)    : [];
+            obj.newMatches = obj.newMatches ? obj.newMatches.split('|').filter(Boolean) : [];
+            if (obj.photo === '[photo_data]' && existingUsers) {
+                const existing = existingUsers.find(u => u.id === obj.id);
+                if (existing) obj.photo = existing.photo;
+            }
+            parsed.push(obj);
+        }
+        return parsed.length > 0 ? parsed : null;
+    },
+
+    downloadCSV: function() {
+        const csv = localStorage.getItem(this._csvKey);
+        if (!csv) { alert('No profile data to export yet.'); return; }
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = 'campus_match_profiles.csv';
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+    },
+
+    importCSVFromFile: function(file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            const existingUsers = this.getUsers() || [];
+            const imported = this.csvToUsers(text, existingUsers);
+            if (imported) { this.saveUsers(imported); callback(imported); }
+            else { alert('Could not parse CSV. Please use a Campus Match export.'); }
+        };
+        reader.readAsText(file);
+    }
+};
+
+// Wait for the DOM to be fully loaded before running scripts
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- STATE MANAGEMENT ---
+    let currentUser = null;
+    let users = [];
+    let swipeQueue = [];
+    let currentSwipeUser = null;
+    let currentChatUser = null;
+    let currentMatchList = []; // For filtering
+    let pendingUser = null; // For email verification
+
+    // DOM Elements
+    const body = document.body;
+    const modeToggleButton = document.getElementById('modeToggle');
+    const allPages = document.querySelectorAll('.container');
+    const userNameSpan = document.getElementById('userName');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // --- HELPERS ---
+    function getChatId(userId1, userId2) {
+        return [userId1, userId2].sort().join('_');
+    }
+
+    function formatTimestamp(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatLastSeen(isoString) {
+        if (!isoString) return 'Offline';
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffSeconds = Math.floor((now - date) / 1000);
+
+        if (diffSeconds < 300) return '🟢 Online'; // 5 mins threshold
+        if (diffSeconds < 86400) return `Last seen ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        return `Last seen ${date.toLocaleDateString()}`;
+    }
+
+    // --- TOAST NOTIFICATION ---
+    window.showToast = (msg) => {
+        let toast = document.getElementById('csvToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'csvToast';
+            toast.style.cssText = `
+                position:fixed; bottom:50px; left:50%; transform:translateX(-50%) translateY(20px);
+                background:linear-gradient(135deg,#27ae60,#1a8a45);
+                color:white; padding:11px 22px; border-radius:50px;
+                font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:600;
+                box-shadow:0 8px 24px rgba(39,174,96,0.4);
+                z-index:9998; opacity:0; transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
+                pointer-events:none; white-space:nowrap;
+            `;
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+        });
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(20px)';
+        }, 2800);
+    }
+
+    // --- INITIALIZATION ---
+    function initializeApp() {
+        // Load users from localStorage or create dummy data
+        const storedUsers = DB.getUsers();
+        const dataVersion = localStorage.getItem('cm_version');
+        if (storedUsers && dataVersion === 'v4') {
+            users = storedUsers;
+        } else {
+            localStorage.clear();
+            localStorage.setItem('cm_version', 'v4');
+            // Create some dummy users if none exist
+            users = [
+                { id: 'u1', password: 'pass123', name: 'Rashmika Mandanna', email: 'rashmika@campus.lk', age: 27, gender: 'Female', preference: 'Male', faculty: 'Performing Arts', year: '3', bio: 'Living life one dance step at a time 🎵 | Travel lover | Fitness freak', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Travel', 'Fitness', 'Dancing', 'Photography'], insta: 'rashmika_mandanna', facebook: '', whatsapp: '+94778899001', likes: [], passes: [], blocked: [] },
+                { id: 'u2', password: 'pass123', name: 'Alia Bhatt', email: 'alia@campus.lk', age: 30, gender: 'Female', preference: 'Male', faculty: 'Film & Media', year: '4', bio: 'Music and movies are my soul. Let\'s travel the world together ✈️', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Travel', 'Fitness'], insta: 'aliaabhatt', facebook: '', whatsapp: '+94777899001', likes: [], passes: [], blocked: [] },
+                { id: 'u3', password: 'pass123', name: 'Tamannaah Bhatia', email: 'tamannaah@campus.lk', age: 33, gender: 'Female', preference: 'Male', faculty: 'Arts & Humanities', year: '4', bio: 'Fitness, art and books — my perfect trio 📚🎨', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Reading', 'Fitness', 'Art'], insta: 'tamannaahspeaks', facebook: '', whatsapp: '+94777899002', likes: [], passes: [], blocked: [] },
+                { id: 'u4', password: 'pass123', name: 'Deepika Padukone', email: 'deepika@campus.lk', age: 37, gender: 'Female', preference: 'Male', faculty: 'Business', year: '5', bio: 'Foodie at heart, gamer by night, dancer always 🕹️💃', photo: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCACWAHMDASIAAhEBAxEB/8QAHAAAAAcBAQAAAAAAAAAAAAAAAAIDBAUGBwEI/8QAOxAAAgEDAgMFBgQEBQUAAAAAAQIDAAQRBRIGITETQVFhcQcUIpGS0iMyQoEVYqGxF1KTweEkM0NTcv/EABsBAAIDAQEBAAAAAAAAAAAAAAEDAAIEBQYH/8QAKBEAAgIBBAEDBAMBAAAAAAAAAAECEQMEEiExEwVBURQiYZEjMlJx/9oADAMBAAIRAxEAPwDAKGK7QoAOAc+lPbaG3kI3qfqpmKURyhyKErLQlT5LBbaVp0uNyP8AWak4eGNOmXKQzH0kNM+Fbb+K6klsXK8ixOMjl41d7q8t9AgxsUzRqCFBBG/ocj+tJ2Tb7OjHVYIx/omyLj9ntg+7JYFBll7U9abzcH6DG6QtNJHMTg7nJX5gcqZ3fFN7cA/Hsj7kUYGP96jdQ1G4E4k7ZmyScknPzq6RmlqL5UV+iy/4f2DQ9rGDKuP0T0yfhHTF6wzA+chqGh4nu41KSSMYlI+Fep/erZYcQ6fd2yQzQNHKFyH345efWl5IS7gzXpdXgvbnxr/qRAy8Maeo+GOT/UNMJdBtV6I/11dZYAy71B2HofGmMttnurJ5px7Z18np+HJG4JFNk0iFeit9VO7TRLOXG9H+s1OvZg91CG22Nyqz1Da7MMPTXDJbVoaDhjTCAezl/wBQ0KmlX4RQpHmyfJ11osH+F+jLsUMUrtFd2iuvZ4oSAxRlHMcs0faKktF057/UIIlidwXBbYuSB6VOyFp4f0SfT0OoNcwC1C5JAYNnAOBy5H/mmV7eme9YuA0O/wDCcEE5HrTzXDMqi2jGE3Zxux88VCRWk2pXCWlspkMfLCDqe+jKugKw8nu/4oAwB0we+mrPbyHDflb8vjmrra+zDWLqFZHCx7uqMeY/epix9lMyW7rdFdx5hl54qm9IZskzKbyBY1WSIDB58vGm9tfS284kBxjvNXzWvZ5qGlAtHOs0PfhelUPULfsJSmMY7qikpdAcXF8mj6NeR3tlGhkLNjcAcA5p68Iql8Bp2+smESKJDGezDNgFvD1q9Orq7LIpVwcEGsepx82j0/o2o343CT5Q1NuKT92welO93OjDa1Y3FndTixp2WO6hT7sxQoUy9ox40DjrXM0YV2j5sFxVj4S1a40/UFht8I8+YzKFBZVOM4+VV8YzU5ww8MWpSzTJuWOB2UbC3xcvDmOWedRPkEujstzd3msCAMzStJjJOSTmt24O4MtNDs0mdQ91L8TseePKsp4D0oarxg84AW1tDvYnoPCtiuONNF0jat0l6sZ6T+7N2Z/fwqkvgbjXuWeONQPy0syKU5ionS+JtI1aIvYXcU6jrsPMeop1fa3Y2Fs011IsUS9WY8qrFpKhrTY0vreN0ZXQEEdCKwv2lcNxWJ99hTEbHGR+k+B8q0y89pnD8kpis1vb184/6eAsPmah9dNpxRo9xbRrLDNtz2VxGUdfA4PUeYpfMZWi7W6NGGaTenT9Tt7oMwEbhjtGTjvrWU1aHWyb2AOEc4w+MjHpWQ3NnNaXr2syFZUbaRWoaTClnaRWqEERqBnOcnvPzzTczuND/S7Wdv8AA8lGOYpv2+04zT6RNyGoa8VkyRWRxPQvK1ySIuhjrQqv++MOXOhQ2C/rChBqMDSVdBronjxYcyBkDNSek2kt9O0EKbnKtnn0GOZ8qiQasHB13b23FFj72kbW8r9i+/oN42gnyyRQIaN7LLSaLQNTZEVpjcYA8cLyHpUfqV5xlczOJrBGBk7MwuWYkePLAxV84Vhh07UNSs4rX3aFJxtGcg8udXP3KxlcNLCjHxpV3yjXGDSMq4O4c1Sz1YyzQJFGcbmj6NnqB38j4/OrdxZosl5amGLLgDdswDuPhzq25gU7Yo1AXwHSm9y6m9OcFRjJHOqSoKbMFu4Nf0VkWLTUYSDO4SODHz6EjAB9OXrU5wvd6trFszXkMirE2FeTmfMA+Fa/caZp9yu94lJxzxy/tURerbWVuyQoqKO4VJddFoJvo898W2ytx0Y3bYjvGrN4Zxk1Ow3Bjvpo2wNshHI+dSI0Ua7xhPO1uSqEFXb8pwcGq9rGo2b8UX72jYh7YqhA5EDln+hqN7lS9g4ZeLJufuWyKQOlJXNuGHSo6xvAVHOpZJA60lnpMTU1ZCtZfEeVCpkxrnpQqll/BH4MdZMUQdadzptY00766Kdo8ZOO10GFHHr8qTFHFQoeh+C9Rm17hq01SaORLrb2Mrt0mKnG8fL55qwm+nVRkEDdtzWaez+4vrXhG3u0l94ggu5FaJHP4SNjIK468iwx41pKTx347LAKOOZB5Gs8++DXiyfaJ6sul3EMYn1LsbqNt8bJLgq3mB/Y1F2ljapfrd3muiW7HIBJiqBfDbnH79aGocKW0TbrG3iCk52MDy9DTNOFzKAssMUSd+Msf61GomuMcTjbkWiTUSrbI23qRyI51CajcySQuzkqg8aeQ2tno9mILaJY1PXHMk+JqncZcQCDTpI7crvI2AkZAJ78d9Lvmhe6k6OcS6z/AAHhIJb/AA3N2NqOo6KwySD44/vWQglGyO6rvxFf6pc8B6QtwYzavIuW7MK2VQhAO8rtyc9Kox606CpGHJPdKyXsNSMZAJqzWWpK4HOqECQeVPLW9eJhk0JY7Nul10sbqXRoq3YKjnQqsR6n+Gvxd1CleNnZWuh8lVuzjNM8UtM29zSeK1x4R5nLLdNs4BRgMUMUYURZqXs34butT4N4heSUwWl0qpA43bhKmfjAHUZIU459asXBkjRaPCtsXe3twYt7jG5lODy68zn0qr8J8eLYcGanZXuo+7XNlCo0uCKEBZWOd27HUkkZ6eNW72brJe8Km6nUBri4lkwq7QMseYHhSpW+xuPsuEHEVmiATMEcdzU21LirT0hJMsYx4mqnxjo9zcxIbeNmZW6p1xUBonDerrc7lgZCRgyTqCMehrNKUk6NkYRaskdS4mkvZeytVLBjgYHWoDibS7uHRRcXIIeSRVAJ6ZrV9J0cWMYZtkk5HN+yUY8hyqK4yee100Xy2yXDWUq3IiYYDbfT1z+1GCppsrklcWkZ17R9KudMtdAEg3Q+6CNZMn8yKoIx3DkCD35qg1qftP4gim0nT9L7Wyu5J4Y7vtLYn8Bufw9TnIJ8KyvNaY3XKMLR2ueFDIod9WQBdZiFAoUjkUKNFrYgRzrmKORzrmMUQM4BXcV0c6FQB1EaR1SNSzsQFA7yeQFeoOG9L/g2g2WnkDNvCqNjvbHxf1JrLvZjwFdXN/b6/qcDQ2kJ320Ui4MzdzY/yjr5nFbbFGDmlTafCHY1XIwuIsfEB1rkEe9uYqVazWVRXYraOA9BSX8j7E0gCjzpjdWqzuUdQykEEEcjUoZE6d9Ism58gUmWbGu5L9kVnnbjvgmfhu9e5t4y+mStlGHPsSf0t5eB/brVO8sV6uvbJLodjNDHLE4IcSKGUjw2nkf3rNeJPZDbzF7nQJxbynJNpcN+Gx8Ef9Po3LzFacOeM0Z546doxrHfiucqkdU0i/0a8ay1KzltbheeyVcEjxHcR5jlUcRWgUGA5UKOv5R1oVAhWjIoqo0j7EVmc9FUZJ/YVrvD/sqX4LjXywc8/comwV/+2Hf5D51pmk6Jp+lRhLGxgtlH/qjCk+p6mkPKk6NUsafR5z03gbiXVWX3fSLlEP8A5Z17JB55bFa5wZ7J9O0ho73VimoXq4YKV/BiPkp/MfM8vKtG7JCMkZJpRVWNQqjFYtZrXijUe2COJe4psUgZUE+Y6VHJdi8v2htFHu8BIlmA5M4/Qvp3n9vGuahcSSv7hbOVdhmaVesa+X8x7vDrS9pBHa26QxIEjUYCjuFcGeol1ZojBJWdvJWRFjj/AO5IcDyHea7JL+EkndgMaTOHmeQ93wL/AL1w7TAF7sYpPkcu2WoDFo7sgnKPyHk3/NKbqRGJoUDdSNpPmO/+lH3EjJxu6N61VyJQYkMMd9EMTMvMgiu7sUC+Bjxro+m59s/G+mUlH3Gd/pdhqVg1nqVnBeWx6RzrnYfFT1U+hFUif2V8LEsVt7tQTyC3TcvTINaBjKA0k8YINd1zkumK2Rb5Rmj+ynRt52aleovcrW6OR+4YZ+QoVoJjGTQqfUTL+GA6iUCnSMFFM1flQEhaQKO+lSkoK2WaskFbJ3fKiTT9mh2837h50RpQi+nQUkoy25jnH968zqNQ8s3NloxBHEIEIBy7HLserE99LbiO+ks5b0ruc1nQzsH6B60RD8BH8xrueVEjOTIP5qKZGdTKSuvcwDj16H+1LE/FkdGHOkpuRRx1B/oaNu5Y8KlgDA5B8qSmk2RM3hRs4PrSM43ROviKZiltyKX5JXAeJspRmPI0ysLgS26P3kZp0TkGvVoSxs5O40K62dx5UKoWIwcR2QX8lx9C/dSNvxNZ+8SZS4wq8vgX7qFCq6pfwyK2OV4jsi/Nbjlz/IvX6qVbiWxAwEucD+RfuoUK874430Mt0FTiOxx+S48fyL91dHEliSfguPoX7qFCh44/AU2B+JLH/JcfQv3UnHxHZb3+G46/5F+6hQq3jjXQLYq/EdiyY2XH0L91ETiSxwMpcfQv3UKFBY4/AbYG4jse5Lj6F+6km4kssA7Lj6F+6hQqLHElsjdP4gtIg8e2fCSMB8A6Z5fqqUTiSxxgrcfQv3UKFemwr7EKn2JtxFZbj8Fx9A+6hQoU2kC2f//Z', interests: ['Food', 'Movies', 'Gaming', 'Fitness', 'Dancing'], insta: 'deepikapadukone', facebook: '', whatsapp: '+94775399003', likes: [], passes: [], blocked: [] },
+                { id: 'u5', password: 'pass123', name: 'Emma Watson', email: 'emma@campus.lk', age: 33, gender: 'Female', preference: 'Male', faculty: 'Computer Science', year: '4', bio: 'Books, code and a good meal 🍴 | Art enthusiast | Music lover', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Food', 'Fitness', 'Art', 'Coding'], insta: 'emmawatson', facebook: '', whatsapp: '+94749879001', likes: [], passes: [], blocked: [] },
+                { id: 'u6', password: 'pass123', name: 'Shah Rukh Khan', email: 'srk@campus.lk', age: 58, gender: 'Male', preference: 'Female', faculty: 'Performing Arts', year: '5', bio: 'King of romance 👑 | Music, movies and everything in between', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Travel', 'Fitness', 'Art', 'Gaming', 'Dancing', 'Coding'], insta: 'imsrk', facebook: '', whatsapp: '+94777877001', likes: [], passes: [], blocked: [] },
+                { id: 'u7', password: 'pass123', name: 'Hrithik Roshan', email: 'hrithik@campus.lk', age: 50, gender: 'Male', preference: 'Female', faculty: 'Sports Science', year: '5', bio: 'Dancing through life 💃 | Sports fanatic | Gamer off the field', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Travel', 'Fitness', 'Gaming', 'Dancing', 'Sports'], insta: 'hrithikroshan', facebook: '', whatsapp: '+94777899001', likes: [], passes: [], blocked: [] },
+                { id: 'u8', password: 'pass123', name: 'Tom Cruise', email: 'tom@campus.lk', age: 62, gender: 'Male', preference: 'Female', faculty: 'Engineering', year: '4', bio: 'Feel the need — the need for speed 🏎️ | Sports & fitness all day', photo: 'data:image/jpeg;base64,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', interests: ['Music', 'Movies', 'Travel', 'Fitness', 'Coding', 'Dancing', 'Sports'], insta: 'tomcruise', facebook: '', whatsapp: '+94775599991', likes: [], passes: [], blocked: [] }
+            ];
+            DB.saveUsers(users); // also generates initial CSV snapshot
+        }
+
+        // Check for logged-in user
+        const currentUserId = DB.getCurrentUserId();
+        if (currentUserId) {
+            currentUser = users.find(u => u.id === currentUserId);
+            if (currentUser) {
+                updateMatchNotification();
+                currentUser.lastSeen = new Date().toISOString();
+                updateAndSaveCurrentUser();
+                userNameSpan.textContent = currentUser.name;
+                showPage('dashboardPage');
+            } else {
+                showPage('loginPage');
+            }
+        } else {
+            showPage('loginPage');
+        }
+
+        // Dark mode persistence
+        if (DB.getTheme() === 'dark') {
+            body.classList.add('dark');
+            modeToggleButton.textContent = '☀️ Light';
+        }
+        
+        // Set initial background
+        const activePage = document.querySelector('.container.active');
+        if (activePage) {
+            body.style.background = window.getComputedStyle(activePage).background;
+        }
+    }
+
+    // --- NAVIGATION ---
+    window.showPage = (pageId) => {
+        allPages.forEach(page => {
+            page.classList.remove('active');
+        });
+        const newPage = document.getElementById(pageId);
+        if (newPage) {
+            newPage.classList.add('active');
+            // Update body background based on the active page
+            body.style.background = window.getComputedStyle(newPage).background;
+        }
+        // Pre-fill profile fields when editing
+        if (pageId === 'profilePage' && currentUser) {
+            document.getElementById('bio').value = currentUser.bio || '';
+            document.getElementById('insta').value = currentUser.insta || '';
+            document.getElementById('facebook').value = currentUser.facebook || '';
+            const wa = (currentUser.whatsapp || '').replace('+94', '');
+            document.getElementById('whatsapp').value = wa;
+            document.querySelectorAll('.interests-grid input[type="checkbox"]').forEach(cb => {
+                cb.checked = (currentUser.interests || []).includes(cb.value);
+            });
+        }
+    }
+
+    function updateMatchNotification() {
+        const badge = document.getElementById('matchNotificationBadge');
+        if (!currentUser || !currentUser.newMatches || currentUser.newMatches.length === 0) {
+            badge.style.display = 'none';
+            return;
+        }
+
+        const newMatchCount = currentUser.newMatches.length;
+        badge.textContent = newMatchCount > 9 ? '9+' : newMatchCount;
+        badge.style.display = 'flex';
+    }
+
+    // --- UI & THEME ---
+    modeToggleButton.addEventListener('click', () => {
+        body.classList.toggle('dark');
+        if (body.classList.contains('dark')) {
+            modeToggleButton.textContent = '☀️ Light';
+            DB.setTheme('dark');
+        } else {
+            modeToggleButton.textContent = '🌙 Dark';
+            DB.setTheme('light');
+        }
+        // Re-apply background after theme change
+        const activePage = document.querySelector('.container.active');
+        if (activePage) {
+            body.style.background = window.getComputedStyle(activePage).background;
+        }
+    });
+
+    // --- UI ENHANCEMENTS (Password Strength) ---
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
+
+    function checkPasswordStrength(password) {
+        let score = 0;
+        if (!password) return 0;
+        if (password.length > 7) score++; // Length > 7
+        if (/[A-Z]/.test(password)) score++; // Has uppercase
+        if (/[0-9]/.test(password)) score++; // Has numbers
+        if (/[^A-Za-z0-9]/.test(password)) score++; // Has special character
+        return score;
+    }
+
+    function updateStrengthIndicator(strength) {
+        const strengthLevels = {
+            0: { text: '', width: '0%', color: '#ddd' },
+            1: { text: 'Weak', width: '25%', color: '#e74c3c' },
+            2: { text: 'Medium', width: '50%', color: '#f39c12' },
+            3: { text: 'Strong', width: '75%', color: '#f1c40f' },
+            4: { text: 'Very Strong', width: '100%', color: '#2ecc71' }
+        };
+        const level = strengthLevels[strength] || strengthLevels[0];
+        
+        if (strengthBar) {
+            strengthBar.style.width = level.width;
+            strengthBar.style.backgroundColor = level.color;
+        }
+        if (strengthText) {
+            strengthText.textContent = level.text;
+        }
+    }
+
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const strength = checkPasswordStrength(password);
+            updateStrengthIndicator(strength);
+        });
+    }
+
+    window.togglePassword = (icon) => {
+        const input = icon.previousElementSibling;
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "🙈"; // Icon for 'Hide'
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️"; // Icon for 'Show'
+        }
+    }
+
+    window.openMatchTab = (evt, tabName, elmnt) => {
+        const card = elmnt.closest('.card');
+        const tabcontent = card.querySelectorAll(".match-tab-content");
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        const tablinks = card.querySelectorAll(".match-tab-button");
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        card.querySelector("#" + tabName).style.display = "block";
+        elmnt.classList.add("active");
+    }
+
+    // --- AUTHENTICATION ---
+    window.login = () => {
+        const identifier = document.getElementById('loginIdentifier').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        const user = users.find(u => (u.email === identifier || u.id === identifier) && u.password === pass);
+        if (user) {
+            currentUser = user;
+            currentUser.lastSeen = new Date().toISOString();
+            updateAndSaveCurrentUser();
+            DB.setCurrentUserId(user.id);
+            userNameSpan.textContent = user.name;
+            showPage('dashboardPage');
+        } else {
+            alert('Invalid credentials. Please check your Email/ID and Password.');
+        }
+    }
+
+    window.logout = () => {
+        currentUser = null;
+        DB.setCurrentUserId(null);
+        showPage('loginPage');
+    }
+
+    window.deleteAccount = () => {
+        if (!currentUser) return;
+
+        const confirmation = confirm("Are you sure you want to delete your account? This action is irreversible.");
+        if (!confirmation) {
+            return;
+        }
+
+        const passwordCheck = prompt("Please enter your password to confirm deletion:");
+        if (passwordCheck === null) { // User clicked cancel
+            return;
+        }
+
+        if (passwordCheck !== currentUser.password) {
+            alert("Incorrect password. Account deletion cancelled.");
+            return;
+        }
+
+        const userIdToDelete = currentUser.id;
+
+        // Filter out the current user
+        users = users.filter(user => user.id !== userIdToDelete);
+
+        // Clean up references in other users (likes, passes, matches, etc.)
+        users.forEach(user => {
+            if (user.likes) user.likes = user.likes.filter(id => id !== userIdToDelete);
+            if (user.passes) user.passes = user.passes.filter(id => id !== userIdToDelete);
+            if (user.blocked) user.blocked = user.blocked.filter(id => id !== userIdToDelete);
+            if (user.newMatches) user.newMatches = user.newMatches.filter(id => id !== userIdToDelete);
+            if (user.unreadMessages) delete user.unreadMessages[userIdToDelete];
+        });
+
+        DB.saveUsers(users);
+
+        // Also remove any chats involving this user
+        const allChats = DB.getChats();
+        for (const chatId in allChats) {
+            const participants = chatId.split('_');
+            if (participants.includes(userIdToDelete)) {
+                delete allChats[chatId];
+            }
+        }
+        DB.saveChats(allChats);
+
+        alert("Your account has been successfully deleted.");
+        logout(); // Log out and go to login page
+    }
+
+    window.showSettingsPage = () => {
+        if (!currentUser) return;
+        // Pre-fill current email and clear password fields
+        document.getElementById('newEmail').value = currentUser.email || '';
+        document.getElementById('currentPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmNewPass').value = '';
+        showPage('settingsPage');
+    }
+
+    window.saveSettings = () => {
+        if (!currentUser) return;
+
+        const currentPass = document.getElementById('currentPass').value;
+        const newEmail = document.getElementById('newEmail').value.trim();
+        const newPass = document.getElementById('newPass').value;
+        const confirmNewPass = document.getElementById('confirmNewPass').value;
+
+        if (!currentPass) {
+            alert('Please enter your current password to make changes.');
+            return;
+        }
+
+        if (currentPass !== currentUser.password) {
+            alert('Incorrect current password.');
+            return;
+        }
+
+        let changesMade = false;
+
+        // --- Update Email ---
+        if (newEmail && newEmail !== currentUser.email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(newEmail)) {
+                alert('Please enter a valid new email address.');
+                return;
+            }
+            if (users.some(u => u.email === newEmail && u.id !== currentUser.id)) {
+                alert('This email address is already registered.');
+                return;
+            }
+            currentUser.email = newEmail;
+            changesMade = true;
+        }
+
+        // --- Update Password ---
+        if (newPass) {
+            if (newPass !== confirmNewPass) {
+                alert('New passwords do not match.');
+                return;
+            }
+            currentUser.password = newPass;
+            changesMade = true;
+        }
+
+        if (changesMade) {
+            updateAndSaveCurrentUser();
+            alert('Your settings have been updated successfully.');
+            showPage('dashboardPage');
+        } else {
+            alert('No changes were made.');
+        }
+    }
+
+    window.forgotPassword = () => {
+        const identifier = prompt("Enter your Email or University ID to recover your password:");
+        if (identifier) {
+            const user = users.find(u => u.email === identifier.trim() || u.id === identifier.trim());
+            if (user) {
+                alert(`Your password is: ${user.password}`);
+            } else {
+                alert("User not found.");
+            }
+        }
+    }
+
+    window.signup = () => {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const age = document.getElementById('age').value;
+        const gender = document.getElementById('gender').value;
+        const pref = document.getElementById('pref').value;
+        const faculty = document.getElementById('faculty').value.trim();
+        const year = document.getElementById('year').value;
+        const studentID = document.getElementById('studentID').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!name || !email || !age || !faculty || !year || !studentID || !password || !confirmPassword) {
+            alert('Please fill all fields.');
+            return;
+        }
+
+        // Simple email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+        if (users.some(u => u.id === studentID)) {
+            alert('Student ID already exists.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match.');
+            return;
+        }
+
+        if (users.some(u => u.email === email)) {
+            alert('Email already registered.');
+            return;
+        }
+
+        // Store user data temporarily
+        pendingUser = {
+            id: studentID, password, name, email, age, gender, preference: pref, faculty, year,
+            bio: '', photo: 'https://i.pravatar.cc/300', interests: [], likes: [], passes: [], blocked: []
+        };
+
+        // Go to verification page
+        showPage('verificationPage');
+    }
+
+    window.verifyCode = () => {
+        // This function is now simplified for the "Simulate Email Verification" button
+        if (pendingUser) {
+            users.push(pendingUser);
+            DB.saveUsers(users);
+            
+            // Log in the new user and go to profile setup
+            currentUser = pendingUser;
+            DB.setCurrentUserId(currentUser.id);
+            alert('Signup successful! Please set up your profile.');
+            showPage('profilePage');
+            pendingUser = null; // Clear pending user
+        } else {
+            // This might happen if the user refreshes the verification page
+            alert('Registration session expired. Please sign up again.');
+            showPage('signupPage');
+        }
+    }
+
+    window.resendVerification = () => {
+        const resendBtn = document.getElementById('resendVerificationBtn');
+        if (!resendBtn) return;
+
+        let cooldown = 30; // 30 seconds cooldown
+        resendBtn.disabled = true;
+        alert("A new verification link has been sent (simulation).");
+
+        const interval = setInterval(() => {
+            cooldown--;
+            resendBtn.textContent = `Resend in ${cooldown}s`;
+            if (cooldown <= 0) {
+                clearInterval(interval);
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Resend Link';
+            }
+        }, 1000);
+    }
+
+    // --- PROFILE SETUP ---
+    let photoDataUrl = null;
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const preview = document.getElementById('preview');
+
+    window.startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+            alert('Could not access camera. Please check permissions.');
+        }
+    }
+
+    window.takePhoto = () => {
+        if (!video.srcObject) {
+            alert("Camera not started.");
+            return;
+        }
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        photoDataUrl = canvas.toDataURL('image/png');
+        preview.src = photoDataUrl;
+        preview.style.display = 'block';
+        video.style.display = 'none';
+        // Stop camera stream
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+    }
+
+    window.checkFileSize = () => {
+        const file = document.getElementById('upload').files[0];
+        if (file && file.size > 2 * 1024 * 1024) { // 2MB
+            alert('File is too large. Please select an image under 2MB.');
+            document.getElementById('upload').value = ''; // Clear selection
+            return;
+        }
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                photoDataUrl = e.target.result;
+                preview.src = photoDataUrl;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    window.saveProfile = () => {
+        if (!currentUser) return;
+        
+        currentUser.bio = document.getElementById('bio').value.trim();
+        currentUser.insta = document.getElementById('insta').value.trim();
+        currentUser.facebook = document.getElementById('facebook').value.trim();
+        const waRaw = document.getElementById('whatsapp').value.trim();
+        if (waRaw && waRaw.length !== 9) {
+            alert('Please enter a valid 9-digit Sri Lankan WhatsApp number (after +94).');
+            return;
+        }
+        currentUser.whatsapp = waRaw ? '+94' + waRaw : '';
+        
+        const interests = [];
+        document.querySelectorAll('.interests-grid input[type="checkbox"]:checked').forEach(cb => {
+            interests.push(cb.value);
+        });
+        currentUser.interests = interests;
+
+        if (photoDataUrl) {
+            currentUser.photo = photoDataUrl;
+        }
+
+        updateAndSaveCurrentUser(); // saves localStorage + syncs CSV
+
+        showToast('Profile saved ✓');
+        userNameSpan.textContent = currentUser.name;
+        showPage('dashboardPage');
+    }
+
+    // --- SWIPING ---
+    window.startSwipe = () => {
+        if (!currentUser) return;
+        
+        const alreadySwiped = [...currentUser.likes, ...currentUser.passes];
+        
+        swipeQueue = users.filter(user => {
+            if (user.id === currentUser.id) return false;
+            if (alreadySwiped.includes(user.id)) return false;
+
+            // New blocking logic
+            if (currentUser.blocked && currentUser.blocked.includes(user.id)) return false; // Don't show users I've blocked
+            if (user.blocked && user.blocked.includes(currentUser.id)) return false; // Don't show users who have blocked me
+
+            if (currentUser.preference !== 'Any' && currentUser.preference !== user.gender) return false;
+            if (user.preference !== 'Any' && user.preference !== currentUser.gender) return false;
+            return true;
+        });
+
+        showPage('swipePage');
+        loadNextSwipeCard();
+    }
+
+    function loadNextSwipeCard() {
+        const swipeCardContainer = document.getElementById('swipeCard');
+        if (swipeQueue.length > 0) {
+            currentSwipeUser = swipeQueue.shift();
+            swipeCardContainer.innerHTML = `
+                <div class="card">
+                    <h3>${currentSwipeUser.name}, ${currentSwipeUser.age}</h3>
+                    <p><em>${currentSwipeUser.faculty}</em></p>
+                    <img src="${currentSwipeUser.photo}" alt="${currentSwipeUser.name}">
+                    <p>${currentSwipeUser.bio}</p>
+                    <p><strong>Interests:</strong> ${currentSwipeUser.interests.join(', ')}</p>
+                    <div class="swipe-card-actions">
+                        <button onclick="initiateContact('chat')" title="Chat">💬</button>
+                        <button onclick="initiateContact('voice')" title="Voice Call">📞</button>
+                        <button onclick="initiateContact('video')" title="Video Call">📹</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            swipeCardContainer.innerHTML = `<div class="card"><p>No more people to show right now. Check back later!</p></div>`;
+            currentSwipeUser = null;
+        }
+    }
+
+    window.likeUser = () => {
+        if (!currentSwipeUser || !currentUser) return;
+        
+        currentUser.likes.push(currentSwipeUser.id);
+        
+        const otherUser = users.find(u => u.id === currentSwipeUser.id);
+        if (otherUser && otherUser.likes.includes(currentUser.id)) {
+            alert(`It's a match with ${otherUser.name}!`);
+            // Add to new matches for notification
+            if (!currentUser.newMatches) {
+                currentUser.newMatches = [];
+            }
+            currentUser.newMatches.push(otherUser.id);
+            updateMatchNotification();
+        }
+        
+        updateAndSaveCurrentUser();
+        showToast('CSV updated ✓');
+        loadNextSwipeCard();
+    }
+
+    window.passUser = () => {
+        if (!currentSwipeUser || !currentUser) return;
+        currentUser.passes.push(currentSwipeUser.id);
+        updateAndSaveCurrentUser();
+        showToast('CSV updated ✓');
+        loadNextSwipeCard();
+    }
+
+    function updateAndSaveCurrentUser() {
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+            users[userIndex] = currentUser;
+            DB.saveUsers(users); // also auto-syncs CSV
+        }
+    }
+
+    window.handleCSVImport = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        DB.importCSVFromFile(file, (importedUsers) => {
+            users = importedUsers;
+            // Try to restore current user from imported data
+            if (currentUser) {
+                const updated = users.find(u => u.id === currentUser.id);
+                if (updated) currentUser = updated;
+            }
+            alert(`CSV imported successfully! ${importedUsers.length} profiles loaded.`);
+            // Reset file input so same file can be re-imported
+            event.target.value = '';
+        });
+    }
+
+    // --- MATCHES & CHAT ---
+    let currentMatchTab = 'matches'; // 'matches' | 'all'
+
+    window.switchMatchTab = (tab) => {
+        currentMatchTab = tab;
+        const tabMatches = document.getElementById('tabMatches');
+        const tabAll     = document.getElementById('tabAll');
+        const filters    = document.getElementById('matchFilters');
+
+        const activeStyle   = '';
+        const inactiveStyle = 'background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;';
+
+        if (tab === 'matches') {
+            tabMatches.style.cssText = activeStyle;
+            tabAll.style.cssText     = inactiveStyle;
+            filters.style.display    = 'none';
+        } else {
+            tabAll.style.cssText     = activeStyle;
+            tabMatches.style.cssText = inactiveStyle;
+            filters.style.display    = 'flex';
+            // Populate faculty filter dynamically from saved profiles
+            populateFacultyFilter();
+        }
+        document.getElementById('matchSearchInput').value = '';
+        filterMatches();
+    }
+
+    function populateFacultyFilter() {
+        const sel = document.getElementById('filterFaculty');
+        const faculties = [...new Set(users.map(u => u.faculty).filter(Boolean))].sort();
+        sel.innerHTML = '<option value="">Any Faculty</option>';
+        faculties.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f; opt.textContent = f;
+            sel.appendChild(opt);
+        });
+    }
+
+    function renderMatches(profilesToRender, isAllTab) {
+        const matchListContainer = document.getElementById('matchList');
+        matchListContainer.innerHTML = '';
+        const countEl = document.getElementById('matchResultCount');
+
+        if (profilesToRender.length === 0) {
+            matchListContainer.innerHTML = `
+                <div style="text-align:center;padding:30px 10px;opacity:0.6;">
+                    <div style="font-size:40px;margin-bottom:10px;">${isAllTab ? '🔍' : '💔'}</div>
+                    <p>${isAllTab ? 'No profiles match your search.' : 'No matches yet. Complete your profile with interests to find people who share at least 3 of them!'}</p>
+                </div>`;
+            countEl.textContent = '';
+            return;
+        }
+
+        countEl.textContent = profilesToRender.length + ' profile' + (profilesToRender.length !== 1 ? 's' : '') + ' found';
+
+        profilesToRender.forEach(profile => {
+            const compat = calculateCompatibility(currentUser, profile);
+            const lastSeen = formatLastSeen(profile.lastSeen);
+            const isMutualMatch = currentUser.likes.includes(profile.id) && profile.likes && profile.likes.includes(currentUser.id);
+            const iLiked  = currentUser.likes.includes(profile.id);
+            const unreadCount = (currentUser.unreadMessages && currentUser.unreadMessages[profile.id]) || 0;
+            const unreadBadge = unreadCount > 0
+                ? `<span class="chat-notification-badge">${unreadCount > 9 ? '9+' : unreadCount}</span>` : '';
+
+            const matchBadge = isMutualMatch
+                ? `<span style="display:inline-block;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;margin-bottom:6px;letter-spacing:0.05em;">💞 MATCHED</span>` : '';
+
+            const likeStatus = !isMutualMatch && iLiked
+                ? `<span style="display:inline-block;background:rgba(232,99,122,0.12);color:var(--rose);font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;margin-bottom:6px;">❤️ You liked</span>` : '';
+
+            const interestTags = (profile.interests || []).map(i =>
+                `<span style="display:inline-block;background:rgba(232,99,122,0.10);color:var(--rose-deep);font-size:11px;padding:3px 9px;border-radius:50px;margin:2px;font-weight:500;">${i}</span>`
+            ).join('');
+
+            // Connecting details – only show on mutual likes
+            const isMutualLike = currentUser.likes.includes(profile.id) && profile.likes && profile.likes.includes(currentUser.id);
+            let connectingDetails = '';
+            if (isMutualLike) {
+                const instaLink = profile.insta
+                    ? '<a href="https://instagram.com/' + profile.insta.replace("@","") + '" target="_blank" style="display:flex;align-items:center;gap:6px;color:var(--rose-deep);font-size:12px;font-weight:500;text-decoration:none;padding:3px 0;"><span style="font-size:15px;">📸</span> @' + profile.insta.replace("@","") + '</a>' : '';
+                const fbLink = profile.facebook
+                    ? '<a href="' + (profile.facebook.startsWith("http") ? profile.facebook : "https://facebook.com/" + profile.facebook) + '" target="_blank" style="display:flex;align-items:center;gap:6px;color:var(--rose-deep);font-size:12px;font-weight:500;text-decoration:none;padding:3px 0;"><span style="font-size:15px;">💙</span> ' + profile.facebook + '</a>' : '';
+                const waLink = profile.whatsapp
+                    ? '<a href="https://wa.me/' + profile.whatsapp.replace("+","") + '" target="_blank" style="display:flex;align-items:center;gap:6px;color:var(--rose-deep);font-size:12px;font-weight:500;text-decoration:none;padding:3px 0;"><span style="font-size:15px;">💬</span> ' + profile.whatsapp + '</a>' : '';
+                const hasAny = instaLink || fbLink || waLink;
+                connectingDetails = hasAny
+                    ? '<div style="margin:10px 0 6px;padding:10px 12px;background:rgba(232,99,122,0.07);border-radius:12px;border:1px solid rgba(232,99,122,0.18);"><div style="font-size:11px;font-weight:700;color:var(--rose-deep);letter-spacing:0.06em;margin-bottom:6px;">🔗 CONNECTING DETAILS</div>' + instaLink + fbLink + waLink + '</div>'
+                    : '<div style="margin:10px 0 6px;padding:8px 12px;background:rgba(232,99,122,0.05);border-radius:12px;border:1px dashed rgba(232,99,122,0.2);font-size:12px;opacity:0.6;text-align:center;">💞 Mutual match — no contact details added yet.</div>';
+            }
+            const actionButtons = isMutualMatch
+                ? `
+                    <div class="match-tabs">
+                        <button class="match-tab-button active" onclick="openMatchTab(event, 'message-tab-${profile.id}', this)">Message</button>
+                        <button class="match-tab-button" onclick="openMatchTab(event, 'voice-tab-${profile.id}', this)">Voice</button>
+                        <button class="match-tab-button" onclick="openMatchTab(event, 'video-tab-${profile.id}', this)">Video</button>
+                    </div>
+                    <div id="message-tab-${profile.id}" class="match-tab-content" style="display: block;">
+                        <button onclick="startChat('${profile.id}')">💬 Chat with ${profile.name}</button>
+                    </div>
+                    <div id="voice-tab-${profile.id}" class="match-tab-content" style="display: none;">
+                        <button onclick="startVoiceCall('${profile.id}')">📞 Voice Call ${profile.name}</button>
+                    </div>
+                    <div id="video-tab-${profile.id}" class="match-tab-content" style="display: none;">
+                        <button onclick="startVideoCall('${profile.id}')">📹 Video Call ${profile.name}</button>
+                    </div>
+                `
+                : (!iLiked ? `<button onclick="quickLike('${profile.id}')" style="flex:1;margin:0;padding:9px;font-size:13px;background:rgba(232,99,122,0.12);border:1.5px solid rgba(232,99,122,0.3);color:var(--rose);box-shadow:none;">❤️ Like</button>` : '');
+
+            matchListContainer.innerHTML += `
+                <div class="card" style="text-align:left;">
+                    ${unreadBadge}
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                        <img src="${profile.photo || 'https://i.pravatar.cc/80'}" alt="${profile.name}"
+                            style="width:58px;height:58px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(232,99,122,0.3);margin:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
+                                <strong style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--rose-deep);">${profile.name}</strong>
+                                <span style="font-size:12px;opacity:0.65;">${profile.age ? profile.age + ' yrs' : ''}</span>
+                            </div>
+                            <div style="font-size:12px;opacity:0.7;margin-top:2px;">${profile.faculty || ''}${profile.year ? ' · Year ' + profile.year : ''}</div>
+                            <div style="font-size:11px;margin-top:2px;">${lastSeen}</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:6px;">${matchBadge}${likeStatus}</div>
+                    ${profile.bio ? `<p style="font-size:13px;margin-bottom:8px;line-height:1.5;">${profile.bio}</p>` : ''}
+                    ${interestTags ? `<div style="margin-bottom:10px;">${interestTags}</div>` : ''}
+                    <div style="margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                            <span style="opacity:0.65;">Compatibility</span>
+                            <strong style="color:var(--rose-deep);">${compat}%</strong>
+                        </div>
+                        <div class="bar"><div class="fill" style="width:${compat}%;"></div></div>
+                    </div>
+                    ${connectingDetails}
+                    ${connectingDetails}
+                    <div style="margin-top:12px;">
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.quickLike = (userId) => {
+        if (!currentUser) return;
+        if (!currentUser.likes.includes(userId)) {
+            currentUser.likes.push(userId);
+            const otherUser = users.find(u => u.id === userId);
+            if (otherUser && otherUser.likes && otherUser.likes.includes(currentUser.id)) {
+                showToast('🎉 It\'s a match with ' + otherUser.name + '!');
+                if (!currentUser.newMatches) currentUser.newMatches = [];
+                currentUser.newMatches.push(userId);
+                updateMatchNotification();
+            } else {
+                showToast('❤️ Liked!');
+            }
+            updateAndSaveCurrentUser();
+            filterMatches(); // re-render to reflect new like state
+        }
+    }
+
+    window.filterMatches = () => {
+        const term    = (document.getElementById('matchSearchInput').value || '').toLowerCase().trim();
+        const gender  = (document.getElementById('filterGender')  || {}).value || '';
+        const faculty = (document.getElementById('filterFaculty') || {}).value || '';
+        const year    = (document.getElementById('filterYear')    || {}).value || '';
+
+        let pool;
+        const isAllTab = currentMatchTab === 'all';
+
+        if (isAllTab) {
+            // All profiles except self, unblocked
+            pool = users.filter(u => {
+                if (u.id === currentUser.id) return false;
+                if (currentUser.blocked && currentUser.blocked.includes(u.id)) return false;
+                if (u.blocked && u.blocked.includes(currentUser.id)) return false;
+                return true;
+            });
+        } else {
+            // Only users with at least 3 common interests
+            const myInterests = currentUser.interests || [];
+            pool = users.filter(u => {
+                if (u.id === currentUser.id) return false;
+                if (currentUser.blocked && currentUser.blocked.includes(u.id)) return false;
+                if (u.blocked && u.blocked.includes(currentUser.id)) return false;
+                const theirInterests = u.interests || [];
+                const commonCount = myInterests.filter(i => theirInterests.includes(i)).length;
+                return commonCount >= 3;
+            });
+        }
+
+        // Text search across name, faculty, bio, interests
+        if (term) {
+            pool = pool.filter(u => {
+                const haystack = [
+                    u.name, u.faculty, u.bio, u.year,
+                    ...(u.interests || [])
+                ].join(' ').toLowerCase();
+                return haystack.includes(term);
+            });
+        }
+
+        // Dropdown filters (only meaningful in All tab)
+        if (gender)  pool = pool.filter(u => u.gender  === gender);
+        if (faculty) pool = pool.filter(u => u.faculty === faculty);
+        if (year)    pool = pool.filter(u => String(u.year) === String(year));
+
+        // Sort: mutual matches first, then by compatibility
+        pool.sort((a, b) => {
+            const aMatch = currentUser.likes.includes(a.id) && a.likes && a.likes.includes(currentUser.id);
+            const bMatch = currentUser.likes.includes(b.id) && b.likes && b.likes.includes(currentUser.id);
+            if (aMatch && !bMatch) return -1;
+            if (!aMatch && bMatch) return 1;
+            return calculateCompatibility(currentUser, b) - calculateCompatibility(currentUser, a);
+        });
+
+        renderMatches(pool, isAllTab);
+    }
+
+    window.initiateContact = (type) => {
+        if (!currentUser || !currentSwipeUser) return;
+
+        const otherUser = users.find(u => u.id === currentSwipeUser.id);
+        const isMatch = currentUser.likes.includes(currentSwipeUser.id) && 
+                        otherUser && otherUser.likes.includes(currentUser.id);
+
+        if (isMatch) {
+            switch (type) {
+                case 'chat':
+                    startChat(currentSwipeUser.id);
+                    break;
+                case 'voice':
+                    startVoiceCall(currentSwipeUser.id);
+                    break;
+                case 'video':
+                    startVideoCall(currentSwipeUser.id);
+                    break;
+            }
+        } else {
+            alert(`You need to match with ${currentSwipeUser.name} to contact them. Press 'Like' to show your interest!`);
+        }
+    }
+
+    window.showMatches = () => {
+        if (!currentUser) return;
+
+        // Clear new match notifications
+        if (currentUser.newMatches && currentUser.newMatches.length > 0) {
+            currentUser.newMatches = [];
+            updateAndSaveCurrentUser();
+            updateMatchNotification();
+        }
+
+        showPage('matchPage');
+
+        // Reset to Matches tab
+        currentMatchTab = 'matches';
+        document.getElementById('tabMatches').style.cssText = '';
+        document.getElementById('tabAll').style.cssText = 'background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;';
+        document.getElementById('matchFilters').style.display = 'none';
+        document.getElementById('matchSearchInput').value = '';
+        filterMatches();
+    }
+    
+    function calculateCompatibility(user1, user2) {
+        const commonInterests = user1.interests.filter(i => user2.interests.includes(i));
+        const maxInterests = Math.max(user1.interests.length, user2.interests.length);
+        if (maxInterests === 0) return 20; // Base compatibility
+        const score = (commonInterests.length / maxInterests) * 100;
+        return Math.min(100, Math.round(score) + 20); // Add base and cap at 100
+    }
+
+    function createMessageHTML(message) {
+        if (!currentUser || !currentChatUser) return '';
+
+        const isCurrentUser = message.senderId === currentUser.id;
+        const messageClass = isCurrentUser ? 'sent' : 'received';
+        const time = formatTimestamp(message.timestamp);
+
+        return `
+            <div class="message-container ${messageClass}">
+                <div class="message-bubble">
+                    <p class="message-text">${message.text}</p>
+                    <span class="message-time">${time}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    window.startChat = (userId) => {
+        currentChatUser = users.find(u => u.id === userId);
+        if (!currentChatUser || !currentUser) return;
+
+        // Clear unread messages for this chat
+        if (currentUser.unreadMessages && currentUser.unreadMessages[userId]) {
+            delete currentUser.unreadMessages[userId];
+            updateAndSaveCurrentUser();
+        }
+        
+        // Setup header with name and call buttons
+        document.getElementById('chatPartnerName').textContent = `${currentChatUser.name}`;
+        const callButtonsContainer = document.getElementById('callButtons');
+        callButtonsContainer.innerHTML = `
+            <button onclick="startVoiceCall('${currentChatUser.id}')" title="Voice Call">📞</button>
+            <button onclick="startVideoCall('${currentChatUser.id}')" title="Video Call">📹</button>
+            <button class="block-btn" onclick="blockUser('${currentChatUser.id}')" title="Block User">🚫</button>
+        `;
+
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML = ''; // Clear the box
+        typingIndicator.style.display = 'none'; // Ensure it's hidden
+
+        const chatId = getChatId(currentUser.id, currentChatUser.id);
+        const allChats = DB.getChats();
+        const chatHistory = allChats[chatId] || [];
+
+        if (chatHistory.length === 0) {
+            chatBox.innerHTML = `<p><em>This is the beginning of your conversation with ${currentChatUser.name}.</em></p>`;
+        } else {
+            chatHistory.forEach(message => {
+                chatBox.innerHTML += createMessageHTML(message);
+            });
+        }
+        
+        chatBox.scrollTop = chatBox.scrollHeight;
+        showPage('chatPage');
+    }
+
+    window.sendMessage = () => {
+        const chatInput = document.getElementById('chatInput');
+        const messageText = chatInput.value.trim();
+
+        if (messageText && currentUser && currentChatUser) {
+            const chatId = getChatId(currentUser.id, currentChatUser.id);
+            const allChats = DB.getChats();
+            if (!allChats[chatId]) {
+                allChats[chatId] = [];
+            }
+
+            // 1. Add user's message
+            const myMessage = {
+                senderId: currentUser.id,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
+            allChats[chatId].push(myMessage);
+            DB.saveChats(allChats); // Save after adding user's message
+
+            // 2. Update UI for user's message
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox.querySelector('em')) { // Remove initial message if it exists
+                chatBox.innerHTML = '';
+            }
+            chatBox.insertAdjacentHTML('beforeend', createMessageHTML(myMessage));
+            chatInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // 3. Show typing indicator and simulate reply
+            typingIndicator.style.display = 'block';
+            typingIndicator.textContent = `${currentChatUser.name} is typing...`;
+
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+            }, 800);
+        }
+    }
+
+    window.startVoiceCall = (userId) => {
+        const partner = users.find(u => u.id === userId);
+        if (!partner) return;
+        const overlay = document.getElementById('callOverlay');
+        document.getElementById('callPartnerAvatar').src = partner.photo;
+        document.getElementById('callStatus').textContent = 'Voice Calling...';
+        document.getElementById('callPartnerNameOverlay').textContent = partner.name;
+        overlay.style.display = 'flex';
+    }
+
+    window.startVideoCall = (userId) => {
+        const partner = users.find(u => u.id === userId);
+        if (!partner) return;
+        const overlay = document.getElementById('callOverlay');
+        document.getElementById('callPartnerAvatar').src = partner.photo;
+        document.getElementById('callStatus').textContent = 'Video Calling...';
+        document.getElementById('callPartnerNameOverlay').textContent = partner.name;
+        overlay.style.display = 'flex';
+    }
+
+    window.blockUser = (userIdToBlock) => {
+        if (!currentUser || !userIdToBlock) return;
+
+        const confirmation = confirm(`Are you sure you want to block this user? You will be unmatched and will no longer see each other.`);
+        if (!confirmation) {
+            return;
+        }
+
+        // Ask if user wants to report as well
+        const wantToReport = confirm("Do you also want to report this user to the admins for inappropriate behavior?");
+        if (wantToReport) {
+            alert("User reported. Thank you for helping keep our community safe.");
+        }
+
+        // Add to current user's blocked list
+        if (!currentUser.blocked) {
+            currentUser.blocked = [];
+        }
+        if (!currentUser.blocked.includes(userIdToBlock)) {
+            currentUser.blocked.push(userIdToBlock);
+        }
+
+        // Remove from likes/matches. A block implies un-matching.
+        currentUser.likes = currentUser.likes.filter(id => id !== userIdToBlock);
+        
+        // Also remove the current user from the other person's likes to break the match
+        const blockedUser = users.find(u => u.id === userIdToBlock);
+        if (blockedUser) {
+            blockedUser.likes = blockedUser.likes.filter(id => id !== currentUser.id);
+        }
+
+        DB.saveUsers(users); // Save the change to the blocked user
+        updateAndSaveCurrentUser(); // Save the change to the current user
+
+        alert("User has been blocked.");
+        showMatches(); // Go back to the matches page, which will now be updated.
+    }
+
+    window.hangUp = () => {
+        document.getElementById('callOverlay').style.display = 'none';
+    }
+
+
+    // --- KICKSTART THE APP ---
+    initializeApp();
+});
+</script>
+</body>
+</html>
