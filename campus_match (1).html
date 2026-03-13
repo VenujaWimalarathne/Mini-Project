@@ -71,8 +71,11 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  transition: background 0.7s ease;
-  background: var(--bg-login);
+  transition: background 0.65s ease;
+  background-image: url('WhatsApp Image 2026-03-12 at 14.48.10.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 body::before {
@@ -614,6 +617,41 @@ input[type="file"]:hover { border-color: var(--rose); background: rgba(232,99,12
 }
 
 #camera { border-radius: var(--radius-sm); margin-bottom: 10px; display: none; box-shadow: var(--shadow-sm); }
+
+
+/* ===== MATCH TABS ===== */
+.match-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+.match-tab-button {
+    flex: 1;
+    padding: 8px;
+    cursor: pointer;
+    border: 1.5px solid rgba(232,99,122,0.3);
+    background: transparent;
+    color: var(--rose);
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.match-tab-button:hover {
+    background: rgba(232,99,122,0.1);
+}
+.match-tab-button.active {
+    background: var(--rose);
+    color: white;
+    border-color: var(--rose);
+    box-shadow: 0 4px 12px rgba(232,99,122,0.25);
+}
+.match-tab-content {
+    display: none;
+}
+.match-tab-content button {
+    width: 100%;
+}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
@@ -1214,6 +1252,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.openMatchTab = (evt, tabName, elmnt) => {
+        const card = elmnt.closest('.card');
+        const tabcontent = card.querySelectorAll(".match-tab-content");
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        const tablinks = card.querySelectorAll(".match-tab-button");
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        card.querySelector("#" + tabName).style.display = "block";
+        elmnt.classList.add("active");
+    }
+
     // --- AUTHENTICATION ---
     window.login = () => {
         const identifier = document.getElementById('loginIdentifier').value.trim();
@@ -1698,11 +1750,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 `<span style="display:inline-block;background:rgba(232,99,122,0.10);color:var(--rose-deep);font-size:11px;padding:3px 9px;border-radius:50px;margin:2px;font-weight:500;">${i}</span>`
             ).join('');
 
-            const chatBtn = isMutualMatch
-                ? `<button onclick="startChat('${profile.id}')" style="flex:1;margin:0;padding:9px;font-size:13px;">💬 Chat</button>` : '';
-
-            const likeBtn = !iLiked
-                ? `<button onclick="quickLike('${profile.id}')" style="flex:1;margin:0;padding:9px;font-size:13px;background:rgba(232,99,122,0.12);border:1.5px solid rgba(232,99,122,0.3);color:var(--rose);box-shadow:none;">❤️ Like</button>` : '';
+            const actionButtons = isMutualMatch
+                ? `
+                    <div class="match-tabs">
+                        <button class="match-tab-button active" onclick="openMatchTab(event, 'message-tab-${profile.id}', this)">Message</button>
+                        <button class="match-tab-button" onclick="openMatchTab(event, 'voice-tab-${profile.id}', this)">Voice</button>
+                        <button class="match-tab-button" onclick="openMatchTab(event, 'video-tab-${profile.id}', this)">Video</button>
+                    </div>
+                    <div id="message-tab-${profile.id}" class="match-tab-content" style="display: block;">
+                        <button onclick="startChat('${profile.id}')">💬 Chat with ${profile.name}</button>
+                    </div>
+                    <div id="voice-tab-${profile.id}" class="match-tab-content" style="display: none;">
+                        <button onclick="startVoiceCall('${profile.id}')">📞 Voice Call ${profile.name}</button>
+                    </div>
+                    <div id="video-tab-${profile.id}" class="match-tab-content" style="display: none;">
+                        <button onclick="startVideoCall('${profile.id}')">📹 Video Call ${profile.name}</button>
+                    </div>
+                `
+                : (!iLiked ? `<button onclick="quickLike('${profile.id}')" style="flex:1;margin:0;padding:9px;font-size:13px;background:rgba(232,99,122,0.12);border:1.5px solid rgba(232,99,122,0.3);color:var(--rose);box-shadow:none;">❤️ Like</button>` : '');
 
             matchListContainer.innerHTML += `
                 <div class="card" style="text-align:left;">
@@ -1729,8 +1794,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="bar"><div class="fill" style="width:${compat}%;"></div></div>
                     </div>
-                    <div style="display:flex;gap:8px;margin-top:4px;">
-                        ${chatBtn}${likeBtn}
+                    <div style="margin-top:12px;">
+                        ${actionButtons}
                     </div>
                 </div>
             `;
