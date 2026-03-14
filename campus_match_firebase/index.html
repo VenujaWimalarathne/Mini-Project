@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Match</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Animated Watermark -->
+<div class="watermark">Campus Match</div>
+
+<!-- Romantic Floating Icons -->
+<div class="floating-container">
+  <div class="floating-icon">❤️</div>
+  <div class="floating-icon">🌹</div>
+  <div class="floating-icon">💌</div>
+  <div class="floating-icon">💕</div>
+  <div class="floating-icon">💖</div>
+  <div class="floating-icon">💍</div>
+</div>
+
+<!-- Fixed Footer Watermark -->
+<div class="watermark-footer">Campus Match © 2024</div>
+
+<!-- Dark/Light Toggle -->
+<button id="modeToggle">🌙 Dark</button>
+
+<!-- Floating Hearts -->
+<div class="heart" style="left:15%; animation-delay:0s;"></div>
+<div class="heart" style="left:35%; animation-delay:2s;"></div>
+<div class="heart" style="left:55%; animation-delay:4s;"></div>
+<div class="heart" style="left:75%; animation-delay:6s;"></div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage" class="container active">
+  <h2>Login</h2>
+  <input id="loginIdentifier" type="text" placeholder="Email or University ID">
+  <div class="password-wrapper">
+    <input id="loginPass" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+  </div>
+  <button onclick="login()">Login</button>
+  <p style="font-size:14px;text-align:right;margin-top:5px;">
+    <a onclick="forgotPassword()" style="cursor:pointer">Forgot Password?</a>
+  </p>
+  <p>No account? <a onclick="showPage('signupPage')" style="cursor:pointer">Signup</a></p>
+</div>
+
+<!-- ===== SIGNUP PAGE ===== -->
+<div id="signupPage" class="container">
+  <h2>Signup</h2>
+  <input id="name" placeholder="Full Name">
+  <input id="email" type="email" placeholder="Email Address">
+  <input id="age" placeholder="Age">
+  <select id="gender">
+    <option>Male</option>
+    <option>Female</option>
+  </select>
+  <select id="pref">
+    <option>Male</option>
+    <option>Female</option>
+    <option>Any</option>
+  </select>
+  <input id="faculty" placeholder="Faculty (e.g. Computer Science)">
+  <input id="year" placeholder="Year">
+  <input id="studentID" placeholder="Student ID">
+  <div class="password-wrapper">
+    <input id="password" type="password" placeholder="Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+  </div>
+  <div id="passwordStrengthIndicator">
+    <div id="strength-bar"></div>
+    <span id="strength-text"></span>
+  </div>
+  <div class="password-wrapper">
+    <input id="confirmPassword" type="password" placeholder="Confirm Password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+  </div>
+  <button onclick="signup()">Signup</button>
+  <p>Already have an account? <a onclick="showPage('loginPage')" style="cursor:pointer">Login</a></p>
+</div>
+
+<!-- ===== VERIFICATION PAGE ===== -->
+<div id="verificationPage" class="container">
+  <h2>Verify Your Email</h2>
+  <p>A verification link has been sent to <strong id="verificationEmail">your email address</strong>.
+     Please check your inbox and click the link to complete your registration.</p>
+  <p class="demo-note">(Since this is a demo without a backend server, no email is actually sent.
+     You can proceed by clicking the button below.)</p>
+  <button onclick="verifyCode()">Simulate Email Verification</button>
+  <button id="resendVerificationBtn" onclick="resendVerification()">Resend Link</button>
+  <p style="margin-top:10px;text-align:center;">
+    <a onclick="showPage('loginPage')" style="cursor:pointer">Back to Login</a>
+  </p>
+</div>
+
+<!-- ===== PROFILE SETUP PAGE ===== -->
+<div id="profilePage" class="container">
+  <h2>Profile Setup</h2>
+  <textarea id="bio" placeholder="Short bio"></textarea>
+  <label>Take Photo:</label>
+  <video id="camera" width="100%" autoplay style="border-radius:15px;margin-bottom:10px;display:none;"></video>
+  <canvas id="canvas" style="display:none"></canvas>
+  <button onclick="startCamera()">Open Camera</button>
+  <button onclick="takePhoto()">Take Photo</button>
+  <label style="text-align:center;display:block;margin-top:10px;">OR Upload Image (Max 2MB)</label>
+  <input type="file" id="upload" onchange="checkFileSize()">
+  <img id="preview" class="preview" alt="Image Preview" style="display:none;width:100%;border-radius:15px;margin-top:10px;">
+
+  <label style="text-align:center;display:block;margin-top:10px;">Interests:</label>
+  <div class="interests-grid">
+    <label><input type="checkbox" value="Music"> Music</label>
+    <label><input type="checkbox" value="Sports"> Sports</label>
+    <label><input type="checkbox" value="Coding"> Coding</label>
+    <label><input type="checkbox" value="Movies"> Movies</label>
+    <label><input type="checkbox" value="Art"> Art</label>
+    <label><input type="checkbox" value="Travel"> Travel</label>
+    <label><input type="checkbox" value="Photography"> Photography</label>
+    <label><input type="checkbox" value="Gaming"> Gaming</label>
+    <label><input type="checkbox" value="Food"> Food</label>
+    <label><input type="checkbox" value="Fitness"> Fitness</label>
+    <label><input type="checkbox" value="Reading"> Reading</label>
+    <label><input type="checkbox" value="Dancing"> Dancing</label>
+  </div>
+
+  <label style="text-align:center;display:block;margin-top:14px;font-weight:600;color:var(--rose-deep);">
+    🔗 Connecting Details
+    <span style="font-size:11px;font-weight:400;opacity:0.65;">(only visible to mutual matches)</span>
+  </label>
+  <input id="insta" placeholder="Instagram username (e.g. @yourname)">
+  <input id="facebook" placeholder="Facebook profile URL or name">
+  <div style="position:relative;">
+    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:#888;pointer-events:none;z-index:2;">+94</span>
+    <input id="whatsapp" placeholder="WhatsApp number (e.g. 771234567)"
+           style="padding-left:44px;" maxlength="9"
+           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  </div>
+  <button onclick="saveProfile()">Save Profile</button>
+</div>
+
+<!-- ===== DASHBOARD PAGE ===== -->
+<div id="dashboardPage" class="container">
+  <h2>Welcome <span id="userName"></span></h2>
+  <button onclick="startSwipe()">Discover People</button>
+  <div class="notification-wrapper">
+    <button onclick="showMatches()">Find Matches</button>
+    <span id="matchNotificationBadge" style="display:none;"></span>
+  </div>
+  <button onclick="showPage('profilePage')">Edit Profile</button>
+  <button onclick="showSettingsPage()">Account Settings</button>
+  <input type="file" id="csvImportInput" accept=".csv" style="display:none;" onchange="handleCSVImport(event)">
+  <button onclick="logout()"
+          style="background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;margin-top:10px;">
+    Logout
+  </button>
+</div>
+
+<!-- ===== SETTINGS PAGE ===== -->
+<div id="settingsPage" class="container">
+  <h2>Account Settings</h2>
+  <label>Current Password (required for changes)</label>
+  <input id="currentPass" type="password" placeholder="Enter current password">
+  <hr style="border:1px solid rgba(255,255,255,0.2);margin:20px 0;">
+  <label>New Email</label>
+  <input id="newEmail" type="email" placeholder="Enter new email address">
+  <label>New Password</label>
+  <div class="password-wrapper">
+    <input id="newPass" type="password" placeholder="Enter new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+  </div>
+  <div class="password-wrapper">
+    <input id="confirmNewPass" type="password" placeholder="Confirm new password">
+    <span class="password-toggle" onclick="togglePassword(this)">👁️</span>
+  </div>
+  <button onclick="saveSettings()">Save Changes</button>
+  <button id="deleteAccountBtn" onclick="deleteAccount()">Delete Account</button>
+  <button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- ===== SWIPE / DISCOVER PAGE ===== -->
+<div id="swipePage" class="container">
+  <h2>Discover People</h2>
+  <div id="swipeCard"></div>
+  <button onclick="likeUser()">❤️ Like</button>
+  <button onclick="passUser()">❌ Pass</button>
+  <button onclick="showPage('dashboardPage')">Back</button>
+</div>
+
+<!-- ===== MATCHES PAGE ===== -->
+<div id="matchPage" class="container">
+  <h2>Find People</h2>
+
+  <!-- Tabs -->
+  <div id="matchTabs" style="display:flex;gap:8px;margin-bottom:14px;">
+    <button id="tabMatches" onclick="switchMatchTab('matches')"
+            style="flex:1;margin:0;padding:10px;border-radius:50px;font-size:13px;">
+      💞 My Matches
+    </button>
+    <button id="tabAll" onclick="switchMatchTab('all')"
+            style="flex:1;margin:0;padding:10px;border-radius:50px;font-size:13px;background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;">
+      🔍 All Profiles
+    </button>
+  </div>
+
+  <!-- Search -->
+  <input type="search" id="matchSearchInput" oninput="filterMatches()"
+         placeholder="Search by name, faculty, interests…" style="margin-bottom:4px;">
+
+  <!-- Filters (All Profiles tab only) -->
+  <div id="matchFilters" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+    <select id="filterGender" onchange="filterMatches()" style="flex:1;min-width:110px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <select id="filterFaculty" onchange="filterMatches()" style="flex:1;min-width:130px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Faculty</option>
+    </select>
+    <select id="filterYear" onchange="filterMatches()" style="flex:1;min-width:90px;margin:0;padding:9px 12px;font-size:13px;">
+      <option value="">Any Year</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4">Year 4</option>
+      <option value="5">Year 5</option>
+    </select>
+  </div>
+
+  <!-- Result count -->
+  <p id="matchResultCount" style="font-size:12px;text-align:right;margin-bottom:6px;opacity:0.6;"></p>
+
+  <div id="matchList"></div>
+  <button onclick="showPage('dashboardPage')"
+          style="background:transparent;border:1.5px solid rgba(232,99,122,0.4);color:var(--rose);box-shadow:none;margin-top:6px;">
+    Back
+  </button>
+</div>
+
+<!-- ===== CHAT PAGE ===== -->
+<div id="chatPage" class="container">
+  <div class="chat-header">
+    <h2 id="chatPartnerName" style="text-align:center;margin:0;flex-grow:1;">Chat</h2>
+    <div id="callButtons"></div>
+  </div>
+  <div id="chatBox" style="height:200px;overflow:auto;border:1px solid #ccc;padding:10px"></div>
+  <div id="typingIndicator" style="display:none;"></div>
+  <input id="chatInput" placeholder="Type message">
+  <button onclick="sendMessage()">Send</button>
+  <button onclick="showPage('matchPage')">Back</button>
+</div>
+
+<!-- ===== CALL OVERLAY ===== -->
+<div id="callOverlay">
+  <div class="call-container">
+    <img id="callPartnerAvatar" src="" alt="Avatar">
+    <h3 id="callStatus">Calling...</h3>
+    <p id="callPartnerNameOverlay"></p>
+    <button id="hangUpButton" onclick="hangUp()">Hang Up</button>
+  </div>
+</div>
+
+<!-- ===== JAVASCRIPT MODULES (load order matters) ===== -->
+<!-- Firebase SDK (compat v9) — must load before db.js -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="js/db.js"></script>
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/swipe.js"></script>
+<script src="js/matches.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script><!-- must be last — initialises the app -->
+
+</body>
+</html>
